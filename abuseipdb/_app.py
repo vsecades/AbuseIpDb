@@ -25,7 +25,7 @@ def check_ip(ip=None,days=Parameters.defaults["days"]):
         # return raw for now, we will add decorators later on
         return response.raw_body
     else:
-        print("ip is not defined")
+        print("IP is not defined")
         return None
 
 def check_cidr(cidr=None,days=Parameters.defaults["days"]):
@@ -56,5 +56,5 @@ def report_ip(categories=None, comment="", ip=None):
         # return raw for now, we will add decorators later on
         return response.raw_body
     else:
-        print("ip is not defined")
+        print("Categories or ip not defined")
         return None
