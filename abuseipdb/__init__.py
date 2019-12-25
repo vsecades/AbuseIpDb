@@ -74,6 +74,10 @@ class AbuseIpDb(object):
             raise ValueError(msg.format(','.join(unknown_categories)))
         return ','.join(sorted(cleaned_categories))
 
+    def blacklist(self, confidence_minimum=None, limit=None):
+        """Retrieve a list of blacklisted IP addresses"""
+        return self.api.blacklist(confidence_minimum, limit)
+
     def check(self, ip_address, max_age_in_days=None):
         """Check a single IPv4 or IPv6 address"""
         ipaddress.ip_address(ip_address)

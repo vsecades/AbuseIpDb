@@ -43,6 +43,7 @@ class AbuseIpDbV2(object):
         if not api_key:
             raise ValueError('An API key is required')
         self._api_key = api_key
+        self._subscriber = subscriber
 
     def __getattr__(self, name):
         raise NotImplementedError('{} not available in APIv2'.format(name))
@@ -50,6 +51,7 @@ class AbuseIpDbV2(object):
     def _get_response(self, endpoint, query):
         BASE_URL = 'https://api.abuseipdb.com/api/v2/{endpoint}'
         KNOWN_ENDPOINTS = {
+            'blacklist': 'GET',
             'check': 'GET',
             'check-block': 'GET',
             'report': 'POST',
@@ -62,6 +64,22 @@ class AbuseIpDbV2(object):
             method=KNOWN_ENDPOINTS[endpoint],
             url=BASE_URL.format(endpoint=endpoint),
             headers=headers, params=query)
+
+    def blacklist(self, confidence_minimum=None, limit=None):
+        query = {}
+        if self._subscriber and confidence_minimum:
+            if confidence_minimum < 25 or confidence_minimum > 100:
+                msg = 'Confidence minimum "{}" not in the range from 25 to 100)'
+                raise ValueError(msg.format(confidence_minimum))
+            query['confidenceMinimum'] = str(confidence_minimum)
+        if limit is not None:
+            if limit < 1:
+                raise ValueError('Limit must be greater than 0')
+            if limit > self.DEFAULT.LIMIT and not self._subscriber:
+                msg = 'Limit {} is above {}, which is not allowed, unless you\'re a subscriber'
+                raise ValueError(msg.format(limit, self.DEFAULT.LIMIT))
+            query['limit'] = str(limit)
+        return self._get_response('blacklist', query)
 
     def check(self, ip_address, max_age_in_days=None):
         query = {
