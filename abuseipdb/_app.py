@@ -20,7 +20,6 @@ def check_ip(ip=None, days=Parameters.defaults["days"]):
         request_url = request_url.replace("[IP]", ip)
         request_url = request_url.replace("[API_KEY]", Parameters.get_config()["API_KEY"])
         request_url = request_url.replace("[DAYS]", days)
-        print(request_url)
         response = unirest.get(request_url)
         # return raw for now, we will add decorators later on
         return response.raw_body
@@ -35,7 +34,6 @@ def check_cidr(cidr=None, days=Parameters.defaults["days"]):
         request_url = request_url.replace("[CIDR]", cidr)
         request_url = request_url.replace("[API_KEY]", Parameters.get_config()["API_KEY"])
         request_url = request_url.replace("[DAYS]", days)
-        print(request_url)
         response = unirest.get(request_url)
         # return raw for now, we will add decorators later on
         return response.raw_body
@@ -51,7 +49,6 @@ def report_ip(categories=None, comment="", ip=None):
         request_url = request_url.replace("[API_KEY]", Parameters.get_config()["API_KEY"])
         request_url = request_url.replace("[COMMENT]", comment)
         request_url = request_url.replace("[CATEGORIES]", categories)
-        print(request_url)
         response = unirest.get(request_url)
         # return raw for now, we will add decorators later on
         return response.raw_body

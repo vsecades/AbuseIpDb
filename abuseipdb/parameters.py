@@ -38,14 +38,9 @@ class Parameters(object):
     @staticmethod
     def dict_merge(list_dicts=None):
         list_dicts = list_dicts or []
-        # print("List received: ")
-        # pp = pprint.PrettyPrinter(indent=4)
-        # pp.pprint(list_dicts)
         # Merge multiple dicts
         target = {}
         while list_dicts:
             temp_dict = list_dicts.pop()
-            # pp.pprint(temp_dict)
             target = Parameters.merge_recursive(target, temp_dict)
-            # pp.pprint(target)
         return target
