@@ -2,6 +2,6 @@
 # -*- coding: utf-8 -*-
 
 __version__ = '1.3.0'  #: the working version
-__release__ = '1.0.0' #: the release version
+__release__ = '1.0.0'  #: the release version
 
-from ._app import configure_api_key, check_ip, check_cidr, report_ip
+from abuseipdb.api_v1 import check_cidr, check_ip, configure_api_key, report_ip
