@@ -1,4 +1,4 @@
-class Parameters():
+class Parameters(object):
 
     configuration = {}
     url_templates = {
@@ -36,13 +36,14 @@ class Parameters():
 
     # taken from https://stackoverflow.com/questions/20656135/python-deep-merge-dictionary-data using recursion
     @staticmethod
-    def dict_merge(list_dicts=[]):
+    def dict_merge(list_dicts=None):
+        list_dicts = list_dicts or []
         # print("List received: ")
         # pp = pprint.PrettyPrinter(indent=4)
         # pp.pprint(list_dicts)
         # Merge multiple dicts
         target = {}
-        while len(list_dicts) > 0:
+        while list_dicts:
             temp_dict = list_dicts.pop()
             # pp.pprint(temp_dict)
             target = Parameters.merge_recursive(target, temp_dict)

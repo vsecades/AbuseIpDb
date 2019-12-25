@@ -4,22 +4,22 @@
 .. codeauthor:: Valentin Secades <vsecades@qxdev.com>
 """
 import unirest
-from parameters import Parameters
+from .parameters import Parameters
 
 def configure_api_key(api_key):
-    #Check that api_key is not None OR that it has been set previously
+    # Check that api_key is not None OR that it has been set previously
     if api_key is not None:
         Parameters.set_config({"API_KEY": api_key})
     else:
         print("Api key cannot be blank")
 
-def check_ip(ip=None,days=Parameters.defaults["days"]):
-    #used to check an IP for reports
+def check_ip(ip=None, days=Parameters.defaults["days"]):
+    # used to check an IP for reports
     if ip is not None:
         request_url = Parameters.url_templates["check_ip"]
-        request_url = request_url.replace("[IP]",ip)
-        request_url = request_url.replace("[API_KEY]",Parameters.get_config()["API_KEY"])
-        request_url = request_url.replace("[DAYS]",days)
+        request_url = request_url.replace("[IP]", ip)
+        request_url = request_url.replace("[API_KEY]", Parameters.get_config()["API_KEY"])
+        request_url = request_url.replace("[DAYS]", days)
         print(request_url)
         response = unirest.get(request_url)
         # return raw for now, we will add decorators later on
@@ -28,7 +28,7 @@ def check_ip(ip=None,days=Parameters.defaults["days"]):
         print("IP is not defined")
         return None
 
-def check_cidr(cidr=None,days=Parameters.defaults["days"]):
+def check_cidr(cidr=None, days=Parameters.defaults["days"]):
     # used to check an IP for reports
     if cidr is not None:
         request_url = Parameters.url_templates["check_cidr"]
