@@ -156,6 +156,16 @@ class GenericApiV1TestCase(TestCase):
         abuse = self.get_api()
         assert type(abuse.api) == AbuseIpDbV1
 
+    def test_blacklist(self):
+        abuse = self.get_api()
+        with self.assertRaises(NotImplementedError):
+            abuse.blacklist()
+
+    def test_bulk_report(self):
+        abuse = self.get_api()
+        with self.assertRaises(NotImplementedError):
+            abuse.bulk_report('some_file.vsv')
+
     @patch('abuseipdb.api_v1.AbuseIpDbV1.check')
     def test_check(self, mock):
         abuse = self.get_api()
@@ -188,6 +198,18 @@ class GenericApiV2TestCase(TestCase):
     def test_creating_api(self):
         abuse = self.get_api()
         assert type(abuse.api) == AbuseIpDbV2
+
+    @patch('abuseipdb.api_v2.AbuseIpDbV2.blacklist')
+    def test_blacklist(self, mock):
+        abuse = self.get_api()
+        abuse.blacklist()
+        mock.assert_called_once_with(None, None)
+
+    @patch('abuseipdb.api_v2.AbuseIpDbV2.bulk_report')
+    def test_bulk_report(self, mock):
+        abuse = self.get_api()
+        abuse.bulk_report('some_file.vsv')
+        mock.assert_called_once_with('some_file.vsv')
 
     @patch('abuseipdb.api_v2.AbuseIpDbV2.check')
     def test_check(self, mock):

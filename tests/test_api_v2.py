@@ -80,6 +80,20 @@ class ApiV2TestCase(TestCase):
             params={'limit': '1234567890'},
             url='https://api.abuseipdb.com/api/v2/blacklist')
 
+    def test_bulk_report_is_not_implemented_yet(self, mock):
+        abuse = self.get_api()
+        with self.assertRaises(NotImplementedError):
+            abuse.bulk_report('some_file.csv')
+
+    def test_check(self, mock):
+        abuse = self.get_api()
+        abuse.check(ip_address=self.TEST_IP_ADDRESS)
+        mock.assert_called_once_with(
+            method='GET',
+            headers={'Key': 'some_API_key', 'Accept': 'application/json'},
+            params={'ipAddress': self.TEST_IP_ADDRESS, 'maxAgeInDays': '30'},
+            url='https://api.abuseipdb.com/api/v2/check')
+
     def test_check(self, mock):
         abuse = self.get_api()
         abuse.check(ip_address=self.TEST_IP_ADDRESS)

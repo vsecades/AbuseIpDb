@@ -39,7 +39,7 @@ class AbuseIpDbV2(object):
         LIMIT = 10000
         MAX_AGE_IN_DAYS = 30
 
-    def __init__(self, api_key):
+    def __init__(self, api_key, subscriber=False):
         if not api_key:
             raise ValueError('An API key is required')
         self._api_key = api_key
@@ -52,6 +52,7 @@ class AbuseIpDbV2(object):
         BASE_URL = 'https://api.abuseipdb.com/api/v2/{endpoint}'
         KNOWN_ENDPOINTS = {
             'blacklist': 'GET',
+            'bulk-report': 'POST',
             'check': 'GET',
             'check-block': 'GET',
             'report': 'POST',
@@ -80,6 +81,9 @@ class AbuseIpDbV2(object):
                 raise ValueError(msg.format(limit, self.DEFAULT.LIMIT))
             query['limit'] = str(limit)
         return self._get_response('blacklist', query)
+
+    def bulk_report(self, file_name):
+        raise NotImplementedError('bulk_report not yet available.  Implementation still pending.')
 
     def check(self, ip_address, max_age_in_days=None):
         query = {

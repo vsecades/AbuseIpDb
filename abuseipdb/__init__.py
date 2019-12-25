@@ -41,11 +41,11 @@ class AbuseIpDb(object):
     For links to the documentation see the modules.
     """
 
-    def __init__(self, api_key, api_version=AbuseIpDbV2.VERSION):
+    def __init__(self, api_key, api_version=AbuseIpDbV2.VERSION, subscriber=False):
         if api_version == AbuseIpDbV1.VERSION:
             self.api = AbuseIpDbV1(api_key=api_key)
         elif api_version == AbuseIpDbV2.VERSION:
-            self.api = AbuseIpDbV2(api_key=api_key)
+            self.api = AbuseIpDbV2(api_key=api_key, subscriber=subscriber)
         else:
             msg = 'API version {} is not supported'
             raise ValueError(msg.format(api_version))
@@ -77,6 +77,10 @@ class AbuseIpDb(object):
     def blacklist(self, confidence_minimum=None, limit=None):
         """Retrieve a list of blacklisted IP addresses"""
         return self.api.blacklist(confidence_minimum, limit)
+
+    def bulk_report(self, file_name):
+        """Report a list of IP addresses by uploading a CSV file"""
+        return self.api.bulk_report(file_name)
 
     def check(self, ip_address, max_age_in_days=None):
         """Check a single IPv4 or IPv6 address"""
