@@ -29,17 +29,23 @@ except ImportError:
 
 from abuseipdb.api_v1 import (AbuseIpDbV1, check_cidr, check_ip,
                               configure_api_key, report_ip)
+from abuseipdb.api_v2 import AbuseIpDbV2
 
 
 class AbuseIpDb(object):
     """Wrapper for AbuseIpDb blacklist service
 
-    Can handle version 1 of the API.
+    Can handle version 1 and 2 of the API.
+    Not all functionality is available for both API versions.
+
+    For links to the documentation see the modules.
     """
 
-    def __init__(self, api_key, api_version=AbuseIpDbV1.VERSION):
+    def __init__(self, api_key, api_version=AbuseIpDbV2.VERSION):
         if api_version == AbuseIpDbV1.VERSION:
             self.api = AbuseIpDbV1(api_key=api_key)
+        elif api_version == AbuseIpDbV2.VERSION:
+            self.api = AbuseIpDbV2(api_key=api_key)
         else:
             msg = 'API version {} is not supported'
             raise ValueError(msg.format(api_version))
