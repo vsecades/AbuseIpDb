@@ -39,6 +39,13 @@ class LegacyTestCase(TestCase):
         abuseipdb.check_ip(ip='192.0.2.123')
         mock.assert_called_once_with('https://www.abuseipdb.com/check/192.0.2.123/json?key=some_API_key&days=30')
 
+    @patch('unirest.get')
+    def test_check_ip__with_different_days(self, mock):
+        self.reset_configuration()
+        abuseipdb.configure_api_key('some_API_key')
+        abuseipdb.check_ip(ip='192.0.2.123', days='90')
+        mock.assert_called_once_with('https://www.abuseipdb.com/check/192.0.2.123/json?key=some_API_key&days=90')
+
     def test_check_cidr__no_api_key_configured(self):
         self.reset_configuration()
         with self.assertRaises(KeyError):
@@ -58,6 +65,15 @@ class LegacyTestCase(TestCase):
         # This URL looks wrong, but the APIv1 documentation doesn't indicate,
         # that the / needs to be encoded.
         mock.assert_called_once_with('https://www.abuseipdb.com/check-block/json?key=some_API_key&network=192.0.2.0/24&days=30')
+
+    @patch('unirest.get')
+    def test_check_cidr__with_different_days(self, mock):
+        self.reset_configuration()
+        abuseipdb.configure_api_key('some_API_key')
+        abuseipdb.check_cidr(cidr='192.0.2.0/24', days='90')
+        # This URL looks wrong, but the APIv1 documentation doesn't indicate,
+        # that the / needs to be encoded.
+        mock.assert_called_once_with('https://www.abuseipdb.com/check-block/json?key=some_API_key&network=192.0.2.0/24&days=90')
 
     def test_report_ip__no_api_key_configured(self):
         self.reset_configuration()
@@ -82,3 +98,12 @@ class LegacyTestCase(TestCase):
         abuseipdb.configure_api_key('some_API_key')
         abuseipdb.report_ip(ip='192.0.2.123', categories="22")
         mock.assert_called_once_with('https://www.abuseipdb.com/report/json?key=some_API_key&category=22&comment=&ip=192.0.2.123')
+
+    @patch('unirest.get')
+    def test_report_ip__with_some_comment(self, mock):
+        self.reset_configuration()
+        abuseipdb.configure_api_key('some_API_key')
+        abuseipdb.report_ip(ip='192.0.2.123', categories="22", comment="Some comment")
+        # This URL looks wrong, but the APIv1 documentation doesn't indicate,
+        # that the comment needs to be encoded.
+        mock.assert_called_once_with('https://www.abuseipdb.com/report/json?key=some_API_key&category=22&comment=Some comment&ip=192.0.2.123')
