@@ -7,6 +7,10 @@ from mock import patch
 
 class LegacyTestCase(TestCase):
 
+    # IP addresses from TEST-NET-1 according to RFC 5737
+    TEST_IP_ADDRESS = '192.0.2.123'
+    TEST_CIDR_NETWORK = '192.0.2.0/24'
+
     def reset_configuration(self):
         # This is required to test the configuration isolated
         Parameters.configuration = {}
@@ -24,7 +28,7 @@ class LegacyTestCase(TestCase):
     def test_check_ip__no_api_key_configured(self):
         self.reset_configuration()
         with self.assertRaises(KeyError):
-            abuseipdb.check_ip(ip='192.0.2.123')
+            abuseipdb.check_ip(ip=self.TEST_IP_ADDRESS)
 
     def test_check_ip__no_ip_address_provided(self):
         self.reset_configuration()
@@ -36,20 +40,20 @@ class LegacyTestCase(TestCase):
     def test_check_ip(self, mock):
         self.reset_configuration()
         abuseipdb.configure_api_key('some_API_key')
-        abuseipdb.check_ip(ip='192.0.2.123')
+        abuseipdb.check_ip(ip=self.TEST_IP_ADDRESS)
         mock.assert_called_once_with('https://www.abuseipdb.com/check/192.0.2.123/json?key=some_API_key&days=30')
 
     @patch('unirest.get')
     def test_check_ip__with_different_days(self, mock):
         self.reset_configuration()
         abuseipdb.configure_api_key('some_API_key')
-        abuseipdb.check_ip(ip='192.0.2.123', days='90')
+        abuseipdb.check_ip(ip=self.TEST_IP_ADDRESS, days='90')
         mock.assert_called_once_with('https://www.abuseipdb.com/check/192.0.2.123/json?key=some_API_key&days=90')
 
     def test_check_cidr__no_api_key_configured(self):
         self.reset_configuration()
         with self.assertRaises(KeyError):
-            abuseipdb.check_cidr(cidr='192.0.2.123')
+            abuseipdb.check_cidr(cidr=self.TEST_CIDR_NETWORK)
 
     def test_check_cidr__no_cidr_network_provided(self):
         self.reset_configuration()
@@ -61,7 +65,7 @@ class LegacyTestCase(TestCase):
     def test_check_cidr(self, mock):
         self.reset_configuration()
         abuseipdb.configure_api_key('some_API_key')
-        abuseipdb.check_cidr(cidr='192.0.2.0/24')
+        abuseipdb.check_cidr(cidr=self.TEST_CIDR_NETWORK)
         # This URL looks wrong, but the APIv1 documentation doesn't indicate,
         # that the / needs to be encoded.
         mock.assert_called_once_with('https://www.abuseipdb.com/check-block/json?key=some_API_key&network=192.0.2.0/24&days=30')
@@ -70,7 +74,7 @@ class LegacyTestCase(TestCase):
     def test_check_cidr__with_different_days(self, mock):
         self.reset_configuration()
         abuseipdb.configure_api_key('some_API_key')
-        abuseipdb.check_cidr(cidr='192.0.2.0/24', days='90')
+        abuseipdb.check_cidr(cidr=self.TEST_CIDR_NETWORK, days='90')
         # This URL looks wrong, but the APIv1 documentation doesn't indicate,
         # that the / needs to be encoded.
         mock.assert_called_once_with('https://www.abuseipdb.com/check-block/json?key=some_API_key&network=192.0.2.0/24&days=90')
@@ -78,7 +82,7 @@ class LegacyTestCase(TestCase):
     def test_report_ip__no_api_key_configured(self):
         self.reset_configuration()
         with self.assertRaises(KeyError):
-            abuseipdb.report_ip(ip='192.0.2.123', categories="22")
+            abuseipdb.report_ip(ip=self.TEST_IP_ADDRESS, categories="22")
 
     def test_report_ip__no_ip_address_provided(self):
         self.reset_configuration()
@@ -90,20 +94,20 @@ class LegacyTestCase(TestCase):
         self.reset_configuration()
         abuseipdb.configure_api_key('some_API_key')
         with self.assertRaises(ValueError):
-            abuseipdb.report_ip(ip='192.0.2.123')
+            abuseipdb.report_ip(ip=self.TEST_IP_ADDRESS)
 
     @patch('unirest.get')
     def test_report_ip(self, mock):
         self.reset_configuration()
         abuseipdb.configure_api_key('some_API_key')
-        abuseipdb.report_ip(ip='192.0.2.123', categories="22")
+        abuseipdb.report_ip(ip=self.TEST_IP_ADDRESS, categories="22")
         mock.assert_called_once_with('https://www.abuseipdb.com/report/json?key=some_API_key&category=22&comment=&ip=192.0.2.123')
 
     @patch('unirest.get')
     def test_report_ip__with_some_comment(self, mock):
         self.reset_configuration()
         abuseipdb.configure_api_key('some_API_key')
-        abuseipdb.report_ip(ip='192.0.2.123', categories="22", comment="Some comment")
+        abuseipdb.report_ip(ip=self.TEST_IP_ADDRESS, categories="22", comment="Some comment")
         # This URL looks wrong, but the APIv1 documentation doesn't indicate,
         # that the comment needs to be encoded.
         mock.assert_called_once_with('https://www.abuseipdb.com/report/json?key=some_API_key&category=22&comment=Some comment&ip=192.0.2.123')
