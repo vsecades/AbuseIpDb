@@ -26,6 +26,12 @@ class LegacyTestCase(TestCase):
         with self.assertRaises(KeyError):
             abuseipdb.check_ip(ip='192.0.2.123')
 
+    def test_check_ip__no_ip_address_provided(self):
+        self.reset_configuration()
+        abuseipdb.configure_api_key('some_API_key')
+        with self.assertRaises(ValueError):
+            abuseipdb.check_ip()
+
     @patch('unirest.get')
     def test_check_ip(self, mock):
         self.reset_configuration()
@@ -37,6 +43,12 @@ class LegacyTestCase(TestCase):
         self.reset_configuration()
         with self.assertRaises(KeyError):
             abuseipdb.check_cidr(cidr='192.0.2.123')
+
+    def test_check_cidr__no_cidr_network_provided(self):
+        self.reset_configuration()
+        abuseipdb.configure_api_key('some_API_key')
+        with self.assertRaises(ValueError):
+            abuseipdb.check_cidr()
 
     @patch('unirest.get')
     def test_check_cidr(self, mock):
@@ -51,6 +63,18 @@ class LegacyTestCase(TestCase):
         self.reset_configuration()
         with self.assertRaises(KeyError):
             abuseipdb.report_ip(ip='192.0.2.123', categories="22")
+
+    def test_report_ip__no_ip_address_provided(self):
+        self.reset_configuration()
+        abuseipdb.configure_api_key('some_API_key')
+        with self.assertRaises(ValueError):
+            abuseipdb.report_ip(categories="22")
+
+    def test_report_ip__no_categories_provided(self):
+        self.reset_configuration()
+        abuseipdb.configure_api_key('some_API_key')
+        with self.assertRaises(ValueError):
+            abuseipdb.report_ip(ip='192.0.2.123')
 
     @patch('unirest.get')
     def test_report_ip(self, mock):
