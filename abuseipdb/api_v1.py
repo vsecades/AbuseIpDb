@@ -67,6 +67,31 @@ def report_ip(categories=None, comment="", ip=None):
 
 class AbuseIpDbV1(object):
 
+    VERSION = 'APIv1'
+    
+    CATEGORIES = {
+        'DDOS_ATTACK': '4',
+        'FTP_BRUTE_FORCE': '5',
+        'PING_OF_DEATH': '6',
+        'PHISHING': '7',
+        'FRAUD_VOIP': '8',
+        'OPEN_PROXY': '9',
+        'WEB_SPAM': '10',
+        'EMAIL_SPAM': '11',
+        'BLOG_SPAM': '12',
+        'VPN_IP':'13',
+        'PORT_SCAN': '14',
+        'HACKING': '15',
+        'SQL_INJECTION': '16',
+        'SPOOFING': '17',
+        'BRUTE_FORCE': '18',
+        'BAD_WEB_BOT': '19',
+        'EXPLOITED_HOST': '20',
+        'WEB_APP_ATTACK': '21',
+        'SSH': '22',
+        'IOT_TARGETED': '23',
+    }
+
     def __init__(self, api_key):
         configure_api_key(api_key)
 
