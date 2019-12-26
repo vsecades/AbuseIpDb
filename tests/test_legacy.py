@@ -13,8 +13,8 @@ class LegacyTestCase(TestCase):
 
     def test_configure_api_key__key_provided(self):
         self.reset_configuration()
-        abuseipdb.configure_api_key('some API key')
-        assert Parameters.get_config() == {'API_KEY': 'some API key'}
+        abuseipdb.configure_api_key('some_API_key')
+        assert Parameters.get_config() == {'API_KEY': 'some_API_key'}
 
     def test_configure_api_key__no_key_provided(self):
         self.reset_configuration()
