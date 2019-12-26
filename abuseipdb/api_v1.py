@@ -3,7 +3,9 @@
 """
 .. codeauthor:: Valentin Secades <vsecades@qxdev.com>
 """
-import unirest
+import requests
+
+
 from .parameters import Parameters
 
 def configure_api_key(api_key):
@@ -20,9 +22,9 @@ def check_ip(ip=None, days=Parameters.defaults["days"]):
     request_url = request_url.replace("[IP]", ip)
     request_url = request_url.replace("[API_KEY]", Parameters.get_config()["API_KEY"])
     request_url = request_url.replace("[DAYS]", days)
-    response = unirest.get(request_url)
+    response = requests.request('GET', request_url)
     # return raw for now, we will add decorators later on
-    return response.raw_body
+    return response.text
 
 def check_cidr(cidr=None, days=Parameters.defaults["days"]):
     # used to check an IP for reports
@@ -32,9 +34,9 @@ def check_cidr(cidr=None, days=Parameters.defaults["days"]):
     request_url = request_url.replace("[CIDR]", cidr)
     request_url = request_url.replace("[API_KEY]", Parameters.get_config()["API_KEY"])
     request_url = request_url.replace("[DAYS]", days)
-    response = unirest.get(request_url)
+    response = requests.request('GET', request_url)
     # return raw for now, we will add decorators later on
-    return response.raw_body
+    return response.text
 
 def report_ip(categories=None, comment="", ip=None):
     # used to check an IP for reports
@@ -45,6 +47,6 @@ def report_ip(categories=None, comment="", ip=None):
     request_url = request_url.replace("[API_KEY]", Parameters.get_config()["API_KEY"])
     request_url = request_url.replace("[COMMENT]", comment)
     request_url = request_url.replace("[CATEGORIES]", categories)
-    response = unirest.get(request_url)
+    response = requests.request('GET', request_url)
     # return raw for now, we will add decorators later on
-    return response.raw_body
+    return response.text
