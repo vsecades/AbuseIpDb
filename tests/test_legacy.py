@@ -20,3 +20,18 @@ class LegacyTestCase(TestCase):
         self.reset_configuration()
         abuseipdb.configure_api_key(None)
         assert Parameters.get_config() == {}
+
+    def test_check_ip__no_api_key_configured(self):
+        self.reset_configuration()
+        with self.assertRaises(KeyError):
+            abuseipdb.check_ip(ip='192.0.2.123')
+
+    def test_check_cidr__no_api_key_configured(self):
+        self.reset_configuration()
+        with self.assertRaises(KeyError):
+            abuseipdb.check_cidr(cidr='192.0.2.123')
+
+    def test_report_ip__no_api_key_configured(self):
+        self.reset_configuration()
+        with self.assertRaises(KeyError):
+            abuseipdb.report_ip(ip='192.0.2.123', categories="22")
