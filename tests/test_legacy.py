@@ -18,8 +18,8 @@ class LegacyTestCase(TestCase):
 
     def test_configure_api_key__no_key_provided(self):
         self.reset_configuration()
-        abuseipdb.configure_api_key(None)
-        assert Parameters.get_config() == {}
+        with self.assertRaises(ValueError):
+            abuseipdb.configure_api_key(None)
 
     def test_check_ip__no_api_key_configured(self):
         self.reset_configuration()
