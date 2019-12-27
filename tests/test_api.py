@@ -12,7 +12,7 @@ from abuseipdb.parameters import Parameters
 
 
 @patch('requests.request')
-class GenericApiTestCase(TestCase):
+class ApiParameterValidationTestCase(TestCase):
     # Testing the parameter validation independent from the used API version
 
     # IP addresses from TEST-NET-1 according to RFC 5737
@@ -139,6 +139,67 @@ class GenericApiTestCase(TestCase):
             abuse.report(self.TEST_IP_ADDRESS, (13, '15 ', 'SSH'))
         mock.assert_called_once_with(self.TEST_IP_ADDRESS, '13,15,22', '')
         request.assert_not_called()
+
+
+class ApiReturnValueTestCase(TestCase):
+    # The tests assume, that the request returns valid JSON, that is already
+    # decoded.  This only works with APIv2, but that is now the default anyway.
+
+    # IP addresses from TEST-NET-1 according to RFC 5737
+    TEST_IP_ADDRESS = '192.0.2.123'
+    TEST_CIDR_NETWORK = '192.0.2.0/24'
+
+    def get_api(self):
+        return AbuseIpDb('some_API_key')
+
+    def assert_response_contains(self, response, key, value):
+        assert key in response.keys()
+        assert response[key] == value
+
+    def test_check_returns_dictionary(self):
+        expected_response = {
+            "ipAddress": "{}".format(self.TEST_IP_ADDRESS)
+        }
+        abuse = self.get_api()
+        with patch.object(abuse.api, '_get_response', return_value={"data": expected_response}):
+            result = abuse.check(self.TEST_IP_ADDRESS)
+        assert type(result) == dict
+        self.assert_response_contains(result, 'ipAddress', self.TEST_IP_ADDRESS)
+
+    def test_check_block_returns_dictionary(self):
+        expected_response = {
+            "networkAddress": "{}".format(self.TEST_CIDR_NETWORK[:-3])
+        }
+        abuse = self.get_api()
+        with patch.object(abuse.api, '_get_response', return_value={"data": expected_response}):
+            result = abuse.check_block(self.TEST_CIDR_NETWORK)
+        assert type(result) == dict
+        self.assert_response_contains(result, 'networkAddress', self.TEST_CIDR_NETWORK[:-3])
+
+    def test_blacklist_returns_list_of_dictionaries(self):
+        expected_response = [{
+            "ipAddress": "{}".format(self.TEST_IP_ADDRESS),
+            "abuseConfidenceScore": 100,
+        }]
+        abuse = self.get_api()
+        with patch.object(abuse.api, '_get_response', return_value={"data": expected_response}):
+            result = abuse.check(self.TEST_IP_ADDRESS)
+        assert type(result) == list
+        assert len(result) == 1
+        result = result[0]
+        self.assert_response_contains(result, 'ipAddress', self.TEST_IP_ADDRESS)
+        self.assert_response_contains(result, 'abuseConfidenceScore', 100)
+
+    def test_report_returns_dictionary(self):
+        expected_response = {
+            "ipAddress": "{}".format(self.TEST_IP_ADDRESS),
+            "abuseConfidenceScore": 52,
+        }
+        abuse = self.get_api()
+        with patch.object(abuse.api, '_get_response', return_value={"data": expected_response}):
+            result = abuse.report(self.TEST_IP_ADDRESS, (13, '15 ', 'SSH'))
+        assert type(result) == dict
+        self.assert_response_contains(result, 'ipAddress', self.TEST_IP_ADDRESS)
 
 
 class GenericApiV1TestCase(TestCase):

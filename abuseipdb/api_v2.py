@@ -1,5 +1,3 @@
-import json
-
 import requests
 
 
@@ -61,10 +59,11 @@ class AbuseIpDbV2(object):
             msg = 'Unknown endpoint "{}"'
             raise NotImplementedError(msg.format(endpoint))
         headers = {'Key': self._api_key, 'Accept': 'application/json'}
-        return requests.request(
+        response = requests.request(
             method=KNOWN_ENDPOINTS[endpoint],
             url=BASE_URL.format(endpoint=endpoint),
             headers=headers, params=query)
+        return response.json()
 
     def blacklist(self, confidence_minimum=None, limit=None):
         query = {}
@@ -80,7 +79,7 @@ class AbuseIpDbV2(object):
                 msg = 'Limit {} is above {}, which is not allowed, unless you\'re a subscriber'
                 raise ValueError(msg.format(limit, self.DEFAULT.LIMIT))
             query['limit'] = str(limit)
-        return self._get_response('blacklist', query)
+        return self._get_response('blacklist', query)['data']
 
     def bulk_report(self, file_name):
         raise NotImplementedError('bulk_report not yet available.  Implementation still pending.')
@@ -90,7 +89,7 @@ class AbuseIpDbV2(object):
             'ipAddress': ip_address,
             'maxAgeInDays': str(max_age_in_days or self.DEFAULT.MAX_AGE_IN_DAYS),
         }
-        return self._get_response('check', query)
+        return self._get_response('check', query)['data']
 
     def check_block(self, cidr_network, max_age_in_days=None):
         """Check a single IPv4 or IPv6 address
@@ -101,7 +100,7 @@ class AbuseIpDbV2(object):
             'network': cidr_network,
             'maxAgeInDays': str(max_age_in_days or self.DEFAULT.MAX_AGE_IN_DAYS),
         }
-        return self._get_response('check-block', query)
+        return self._get_response('check-block', query)['data']
 
     def report(self, ip_address, categories, comment=''):
         query = {
@@ -109,4 +108,4 @@ class AbuseIpDbV2(object):
             'categories': categories,
             'comment': comment,
         }
-        return self._get_response('report', query)
+        return self._get_response('report', query)['data']
