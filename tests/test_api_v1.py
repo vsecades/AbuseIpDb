@@ -9,8 +9,6 @@ except ImportError:
     from mock import patch
 
 
-
-
 class ApiV1TestCase(TestCase):
     # Only testing the new interface.  The rest is tested in `test_legacy.py`
 

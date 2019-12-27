@@ -8,7 +8,6 @@ except ImportError:
     from mock import patch
 
 
-
 @patch('requests.request')
 class ApiV2TestCase(TestCase):
 

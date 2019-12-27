@@ -1,7 +1,5 @@
 from unittest import TestCase
 
-from requests import HTTPError
-
 from abuseipdb import AbuseIpDb
 from abuseipdb.api_v1 import AbuseIpDbV1
 from abuseipdb.api_v2 import AbuseIpDbV2

@@ -9,7 +9,6 @@ except ImportError:
     from mock import patch
 
 
-
 class LegacyTestCase(TestCase):
 
     # IP addresses from TEST-NET-1 according to RFC 5737
