@@ -1,8 +1,13 @@
 from unittest import TestCase
 
+try:
+    from unittest.mock import patch
+except ImportError:
+    from mock import patch
+
 import abuseipdb
 from abuseipdb.parameters import Parameters
-from mock import patch
+
 
 
 class LegacyTestCase(TestCase):
@@ -36,19 +41,23 @@ class LegacyTestCase(TestCase):
         with self.assertRaises(ValueError):
             abuseipdb.check_ip()
 
-    @patch('unirest.get')
+    @patch('requests.request')
+
     def test_check_ip(self, mock):
         self.reset_configuration()
         abuseipdb.configure_api_key('some_API_key')
         abuseipdb.check_ip(ip=self.TEST_IP_ADDRESS)
-        mock.assert_called_once_with('https://www.abuseipdb.com/check/192.0.2.123/json?key=some_API_key&days=30')
+        mock.assert_called_once_with(
+            'GET', 'https://www.abuseipdb.com/check/192.0.2.123/json?key=some_API_key&days=30')
 
-    @patch('unirest.get')
+    @patch('requests.request')
+
     def test_check_ip__with_different_days(self, mock):
         self.reset_configuration()
         abuseipdb.configure_api_key('some_API_key')
         abuseipdb.check_ip(ip=self.TEST_IP_ADDRESS, days='90')
-        mock.assert_called_once_with('https://www.abuseipdb.com/check/192.0.2.123/json?key=some_API_key&days=90')
+        mock.assert_called_once_with(
+            'GET', 'https://www.abuseipdb.com/check/192.0.2.123/json?key=some_API_key&days=90')
 
     def test_check_cidr__no_api_key_configured(self):
         self.reset_configuration()
@@ -61,23 +70,28 @@ class LegacyTestCase(TestCase):
         with self.assertRaises(ValueError):
             abuseipdb.check_cidr()
 
-    @patch('unirest.get')
+    @patch('requests.request')
+
     def test_check_cidr(self, mock):
         self.reset_configuration()
         abuseipdb.configure_api_key('some_API_key')
         abuseipdb.check_cidr(cidr=self.TEST_CIDR_NETWORK)
         # This URL looks wrong, but the APIv1 documentation doesn't indicate,
         # that the / needs to be encoded.
-        mock.assert_called_once_with('https://www.abuseipdb.com/check-block/json?key=some_API_key&network=192.0.2.0/24&days=30')
+        mock.assert_called_once_with(
+            'GET', 'https://www.abuseipdb.com/check-block/json?key=some_API_key&network=192.0.2.0/24&days=30')
 
-    @patch('unirest.get')
+    @patch('requests.request')
+
     def test_check_cidr__with_different_days(self, mock):
         self.reset_configuration()
         abuseipdb.configure_api_key('some_API_key')
         abuseipdb.check_cidr(cidr=self.TEST_CIDR_NETWORK, days='90')
         # This URL looks wrong, but the APIv1 documentation doesn't indicate,
         # that the / needs to be encoded.
-        mock.assert_called_once_with('https://www.abuseipdb.com/check-block/json?key=some_API_key&network=192.0.2.0/24&days=90')
+        mock.assert_called_once_with(
+            'GET', 'https://www.abuseipdb.com/check-block/json?key=some_API_key&network=192.0.2.0/24&days=90')
+
 
     def test_report_ip__no_api_key_configured(self):
         self.reset_configuration()
@@ -96,18 +110,23 @@ class LegacyTestCase(TestCase):
         with self.assertRaises(ValueError):
             abuseipdb.report_ip(ip=self.TEST_IP_ADDRESS)
 
-    @patch('unirest.get')
+    @patch('requests.request')
+
     def test_report_ip(self, mock):
         self.reset_configuration()
         abuseipdb.configure_api_key('some_API_key')
         abuseipdb.report_ip(ip=self.TEST_IP_ADDRESS, categories="22")
-        mock.assert_called_once_with('https://www.abuseipdb.com/report/json?key=some_API_key&category=22&comment=&ip=192.0.2.123')
+        mock.assert_called_once_with(
+            'GET', 'https://www.abuseipdb.com/report/json?key=some_API_key&category=22&comment=&ip=192.0.2.123')
 
-    @patch('unirest.get')
+    @patch('requests.request')
+
     def test_report_ip__with_some_comment(self, mock):
         self.reset_configuration()
         abuseipdb.configure_api_key('some_API_key')
         abuseipdb.report_ip(ip=self.TEST_IP_ADDRESS, categories="22", comment="Some comment")
         # This URL looks wrong, but the APIv1 documentation doesn't indicate,
         # that the comment needs to be encoded.
-        mock.assert_called_once_with('https://www.abuseipdb.com/report/json?key=some_API_key&category=22&comment=Some comment&ip=192.0.2.123')
+        mock.assert_called_once_with(
+            'GET', 'https://www.abuseipdb.com/report/json?key=some_API_key&category=22&comment=Some comment&ip=192.0.2.123')
+
