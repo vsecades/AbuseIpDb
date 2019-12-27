@@ -1,7 +1,11 @@
 from unittest import TestCase
 
+try:
+    from unittest.mock import patch
+except ImportError:
+    from mock import patch
+
 from abuseipdb.api_v2 import AbuseIpDbV2
-from mock import patch
 
 
 @patch('requests.request')

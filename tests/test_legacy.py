@@ -1,8 +1,12 @@
 from unittest import TestCase
 
+try:
+    from unittest.mock import patch
+except ImportError:
+    from mock import patch
+
 import abuseipdb
 from abuseipdb.parameters import Parameters
-from mock import patch
 
 
 class LegacyTestCase(TestCase):
