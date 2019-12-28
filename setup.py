@@ -22,10 +22,32 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
+
+def read_requirements():
+    """Read the dependencies from requirements.txt
+
+    This keeps the dependencies in one place.  Otherwise we would need to
+    define them in two places:
+     *  requirements.txt - required by the GitHub workflow
+     *  setup.py         - required by the packaging
+
+    Thos two are combined with this method.  Still we have dependencies in the
+    following file:
+     *  tox.ini          - required by testing with different environments
+    """
+    requirements = []
+    with open(path.join(here, 'requirements.txt'), encoding='utf-8') as f:
+        for line in f.readlines():
+            if '#' in line:
+                line = line[:line.find('#')]
+            line = line.strip()
+            if not line:
+                continue
+            requirements.append('{}'.format(line))
+    return requirements
+
 # Arguments marked as "Required" below must be included for upload to PyPI.
 # Fields marked as "Optional" may be commented out.
-
-install_requires = ['requests']
 
 setup(
     # This is the name of your project. The first time you publish this
@@ -139,7 +161,7 @@ setup(
     #
     # For an analysis of "install_requires" vs pip's requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=install_requires,  # Optional
+    install_requires=read_requirements(),  # Optional
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). Users will be able to install these using the "extras"

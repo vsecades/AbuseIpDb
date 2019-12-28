@@ -3,3 +3,6 @@ include *.md
 
 # Include the license file
 include LICENSE.txt
+
+# We need to include the requirements to be able to read them from setup.py
+include requirements.txt

@@ -1,1 +1,6 @@
+# Dependencies of the project
+#
+# This is required by the GitHub workflow.  It uses it to install the
+# dependencies.  To keep this definition in one place, `setup.py` reads this
+# file to set the dependencies of the package.
 requests
