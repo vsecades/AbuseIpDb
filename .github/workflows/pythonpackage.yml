@@ -1,4 +1,4 @@
-name: Python application
+name: Python package
 
 on: [push]
 
@@ -6,17 +6,21 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [2.7, 3.5, 3.6, 3.7]
 
     steps:
     - uses: actions/checkout@v1
-    - name: Set up Python 3.7
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v1
       with:
-        python-version: 3.7
+        python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install requests
+        pip install -r requirements.txt
     - name: Lint with flake8
       run: |
         pip install flake8
@@ -26,5 +30,5 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        pip install pytest
+        pip install pytest mock
         python -m pytest
