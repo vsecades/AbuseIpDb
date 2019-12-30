@@ -1,13 +1,12 @@
 from unittest import TestCase
 
+import abuseipdb
+from abuseipdb.parameters import Parameters
+
 try:
     from unittest.mock import patch
 except ImportError:
     from mock import patch
-
-import abuseipdb
-from abuseipdb.parameters import Parameters
-
 
 
 class LegacyTestCase(TestCase):
@@ -42,7 +41,6 @@ class LegacyTestCase(TestCase):
             abuseipdb.check_ip()
 
     @patch('requests.request')
-
     def test_check_ip(self, mock):
         self.reset_configuration()
         abuseipdb.configure_api_key('some_API_key')
@@ -51,7 +49,6 @@ class LegacyTestCase(TestCase):
             'GET', 'https://www.abuseipdb.com/check/192.0.2.123/json?key=some_API_key&days=30')
 
     @patch('requests.request')
-
     def test_check_ip__with_different_days(self, mock):
         self.reset_configuration()
         abuseipdb.configure_api_key('some_API_key')
@@ -71,7 +68,6 @@ class LegacyTestCase(TestCase):
             abuseipdb.check_cidr()
 
     @patch('requests.request')
-
     def test_check_cidr(self, mock):
         self.reset_configuration()
         abuseipdb.configure_api_key('some_API_key')
@@ -82,7 +78,6 @@ class LegacyTestCase(TestCase):
             'GET', 'https://www.abuseipdb.com/check-block/json?key=some_API_key&network=192.0.2.0/24&days=30')
 
     @patch('requests.request')
-
     def test_check_cidr__with_different_days(self, mock):
         self.reset_configuration()
         abuseipdb.configure_api_key('some_API_key')
@@ -91,7 +86,6 @@ class LegacyTestCase(TestCase):
         # that the / needs to be encoded.
         mock.assert_called_once_with(
             'GET', 'https://www.abuseipdb.com/check-block/json?key=some_API_key&network=192.0.2.0/24&days=90')
-
 
     def test_report_ip__no_api_key_configured(self):
         self.reset_configuration()
@@ -111,7 +105,6 @@ class LegacyTestCase(TestCase):
             abuseipdb.report_ip(ip=self.TEST_IP_ADDRESS)
 
     @patch('requests.request')
-
     def test_report_ip(self, mock):
         self.reset_configuration()
         abuseipdb.configure_api_key('some_API_key')
@@ -120,7 +113,6 @@ class LegacyTestCase(TestCase):
             'GET', 'https://www.abuseipdb.com/report/json?key=some_API_key&category=22&comment=&ip=192.0.2.123')
 
     @patch('requests.request')
-
     def test_report_ip__with_some_comment(self, mock):
         self.reset_configuration()
         abuseipdb.configure_api_key('some_API_key')
@@ -129,4 +121,3 @@ class LegacyTestCase(TestCase):
         # that the comment needs to be encoded.
         mock.assert_called_once_with(
             'GET', 'https://www.abuseipdb.com/report/json?key=some_API_key&category=22&comment=Some comment&ip=192.0.2.123')
-

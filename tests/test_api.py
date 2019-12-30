@@ -1,14 +1,15 @@
 from unittest import TestCase
 
+from abuseipdb import AbuseIpDb
+from abuseipdb.api_v1 import AbuseIpDbV1
+from abuseipdb.api_v2 import AbuseIpDbV2
+from abuseipdb.parameters import Parameters
+
 try:
     from unittest.mock import patch
 except ImportError:
     from mock import patch
 
-from abuseipdb import AbuseIpDb
-from abuseipdb.api_v1 import AbuseIpDbV1
-from abuseipdb.api_v2 import AbuseIpDbV2
-from abuseipdb.parameters import Parameters
 
 
 @patch('requests.request')
@@ -200,6 +201,37 @@ class ApiReturnValueTestCase(TestCase):
             result = abuse.report(self.TEST_IP_ADDRESS, (13, '15 ', 'SSH'))
         assert type(result) == dict
         self.assert_response_contains(result, 'ipAddress', self.TEST_IP_ADDRESS)
+
+
+@patch('requests.Response.raise_for_status', side_effect=HTTPError)
+class NetworkFailureTestCase(TestCase):
+
+    # IP addresses from TEST-NET-1 according to RFC 5737
+    TEST_IP_ADDRESS = '192.0.2.123'
+    TEST_CIDR_NETWORK = '192.0.2.0/24'
+
+    def get_api(self):
+        return AbuseIpDb('some_API_key')
+
+    def test_blacklist_network_errors_are_propagated(self, mock):
+        abuse = self.get_api()
+        with self.assertRaises(HTTPError):
+            abuse.blacklist(self.TEST_IP_ADDRESS)
+
+    def test_check_network_errors_are_propagated(self, mock):
+        abuse = self.get_api()
+        with self.assertRaises(HTTPError):
+            abuse.check(self.TEST_IP_ADDRESS)
+
+    def test_check_block_network_errors_are_propagated(self, mock):
+        abuse = self.get_api()
+        with self.assertRaises(HTTPError):
+            abuse.check_block(self.TEST_CIDR_NETWORK)
+
+    def test_report_network_errors_are_propagated(self, mock):
+        abuse = self.get_api()
+        with self.assertRaises(HTTPError):
+            abuse.report(self.TEST_IP_ADDRESS, '22')
 
 
 class GenericApiV1TestCase(TestCase):
