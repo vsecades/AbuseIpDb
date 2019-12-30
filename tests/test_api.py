@@ -1,4 +1,5 @@
 from unittest import TestCase
+from urllib3.exceptions import HTTPError
 
 from abuseipdb import AbuseIpDb
 from abuseipdb.api_v1 import AbuseIpDbV1
