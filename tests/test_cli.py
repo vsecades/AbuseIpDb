@@ -29,9 +29,10 @@ class CommandLineTestCase(TestCase):
             config_file="/etc/abiseipdb",
         )
         defaults.update(**kwargs)
-        with patch('abuseipdb.cli._parse_parameter', return_value=Namespace(**defaults)):
-            with patch('abuseipdb.AbuseIpDb.{}'.format(kwargs['action'])) as mock:
-                abuseipdb_cli()
+        with patch('abuseipdb.cli._print_result'):
+            with patch('abuseipdb.cli._parse_parameter', return_value=Namespace(**defaults)):
+                with patch('abuseipdb.AbuseIpDb.{}'.format(kwargs['action'])) as mock:
+                    abuseipdb_cli()
         return mock
 
     def test_blacklist__without_any_optional_parameter(self, api_key_mock):

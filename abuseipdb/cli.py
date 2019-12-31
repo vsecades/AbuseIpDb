@@ -1,4 +1,5 @@
 import argparse
+import json
 import os
 import stat
 import sys
@@ -11,7 +12,16 @@ def main():
     args = _parse_parameter()
     api = _create_api(args)
     kwargs = _create_kwargs_from_args(args)
-    getattr(api, args.action)(**kwargs)
+    result = _call_action(api, args.action, **kwargs)
+    _print_result(result)
+
+
+def _call_action(api, action, **kwargs):
+    return getattr(api, action)(**kwargs)
+
+
+def _print_result(result):
+    print(json.dumps(result, indent=4, sort_keys=True))
 
 
 def _create_kwargs_from_args(args):
