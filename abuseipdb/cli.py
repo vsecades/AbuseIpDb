@@ -1,12 +1,54 @@
 import argparse
 import sys
 
+from abuseipdb import AbuseIpDb
+
 
 def main():
-    args = parse_parameter()
+    args = _parse_parameter()
+    api = _create_api(args)
+    kwargs = _create_kwargs_from_args(args)
+    getattr(api, args.action)(**kwargs)
 
 
-def parse_parameter():
+def _create_kwargs_from_args(args):
+    if args.action == "blacklist":
+        filter_for_keys = ("confidence_minimum", "limit")
+    elif args.action == "bulk_report":
+        filter_for_keys = ("file_name")
+        args.file_name = args.report_file
+    elif args.action == "check":
+        filter_for_keys = ("ip_address", "max_age_in_days")
+    elif args.action == "check_block":
+        filter_for_keys = ("cidr_network", "max_age_in_days")
+    elif args.action == "report":
+        filter_for_keys = ("ip_address", "categories", "comment")
+    else:
+        filter_for_keys = ()
+    # only pass on the relevant parameters
+    kwargs = {k: v for k, v in vars(args).items() if k in filter_for_keys}
+    # argparse stores the following parameters as a list
+    if "categories"in kwargs.keys():
+        kwargs["categories"] = ",".join(str(c) for c in kwargs["categories"])
+    if "comment"in kwargs.keys():
+        kwargs["comment"] = " ".join(str(c) for c in kwargs["comment"])
+    return kwargs
+
+
+def _create_api(args):
+    api_version = "APIv{}".format(args.api_version)
+    api_key, subscriber = _read_api_key_and_subscriber_status(args.config_file)
+    subscriber = False
+    return AbuseIpDb(api_key=api_key, api_version=api_version, subscriber=subscriber)
+
+
+def _read_api_key_and_subscriber_status(file_name):
+    # Need to be a separate method to be able to mock it
+    # Currently this is a stub.
+    return "SomeAPIkey", False
+
+
+def _parse_parameter():
     parser = argparse.ArgumentParser(
         prog="abusipdb",
         description=description_text,
