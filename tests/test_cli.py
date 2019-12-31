@@ -1,12 +1,8 @@
 from argparse import Namespace
 from unittest import TestCase
+from unittest.mock import patch
 
 from abuseipdb.cli import main as abuseipdb_cli
-
-try:
-    from unittest.mock import patch
-except ImportError:
-    from mock import patch
 
 
 @patch('abuseipdb.cli._read_api_key_and_subscriber_status', return_value=("SomeAPIkey", False))

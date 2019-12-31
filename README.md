@@ -1,11 +1,7 @@
 # AbuseIpDb - Wrapper around the Abuse IP DB service API
 
-The package supports APIv1 and APIv2.  Retrieving a blacklist is only available
-for APIv2.  Uploading a CSV report of abusive IP addresses is not yet
-implemented.
-
-**Please note:** The APIv1 is deprecated by AbuseIpDb.  They set the sunset
-date to 2020-02-01.  You should start using APIv2 now.
+The package supports APIv2.  No other API is currently available.  Uploading a
+CSV report of abusive IP addresses is not yet implemented.
 
 ## Installing
 
@@ -15,17 +11,11 @@ pip install abuseipdb
 
 ## Usage as a python module
 
-**Note:** The package still supports the existing methods for the APIv1.
-This enables you to migrate gradually.
-
-We will only describe the new class-based usage below.
-
 To choose between the API versions, you pass the version as the second
-parameter.  Use the string APIv1 or APIv2 to select the API version.
+parameter.  Use the string APIv2 to select the API version.
 
 ```python
 from abuseipdb import AbuseIpDb
-abuse_v1 = AbuseIpDb(api_key='APIv1key', api_version='APIv1')  # Using API v1
 abuse_v2 = AbuseIpDb(api_key='APIv2key', api_version='APIv2')  # Using API v2
 abuse = AbuseIpDb(api_key='APIv2key')                          # Also using API v2
 ```
@@ -75,8 +65,6 @@ abuse.report(ip_address="192.0.2.123", categories=("13", "22"),
 
 ### Report a list of abusive IP addresses
 
-**APIv2 only**
-
 Please refer to [IP Bulk Reporter](https://www.abuseipdb.com/bulk-report)
 for the exact specification of the CSV file.
 
@@ -85,8 +73,6 @@ abuse.bulk_report(file_name="report.csv")
 ```
 
 ### Retrieve a list of abusive IP addresses
-
-**APIv2 only**
 
 ```python
 abuse.blacklist()
