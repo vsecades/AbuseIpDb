@@ -17,7 +17,7 @@ date to 2020-02-01.  You should start using APIv2 now.
 pip install abuseipdb
 ```
 
-## Usage
+## Usage as a python module
 
 **Note:** The package still supports the existing methods for the APIv1.
 This enables you to migrate gradually.
@@ -96,6 +96,16 @@ abuse.bulk_report(file_name="report.csv")
 abuse.blacklist()
 abuse.blacklist(limit=10)             # Only get 10 entries
 abuse.blacklist(confidence_level=90)  # Only available for subscribers
+```
+
+## Usage on the command line
+
+You can invoke the module on the command line.  It supports all the commands
+listed above.  For the explicit syntax and the required configuration call it
+with the `--help` parameter.
+
+```bash
+abuseipdb --help
 ```
 
 ## Project links

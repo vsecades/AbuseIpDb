@@ -1,7 +1,10 @@
 import argparse
+import os
+import stat
 import sys
 
 from abuseipdb import AbuseIpDb
+from configparser import ConfigParser, NoOptionError
 
 
 def main():
@@ -43,9 +46,17 @@ def _create_api(args):
 
 
 def _read_api_key_and_subscriber_status(file_name):
-    # Need to be a separate method to be able to mock it
-    # Currently this is a stub.
-    return "SomeAPIkey", False
+    # Need to be a separate method to be able to mock it.
+    if os.stat(file_name).st_mode & (stat.S_IRWXG | stat.S_IRWXO):
+        raise OSError('Security issue!  Configuration readable by others than the owner!')
+    config = ConfigParser()
+    config.read(file_name)
+    api_key = config.get('AbuseIPDB', 'api_key')
+    try:
+        subscriber = config.get('AbuseIPDB', 'subscriber')
+    except NoOptionError:
+        subscriber = False
+    return api_key, subscriber
 
 
 def _parse_parameter():
@@ -147,7 +158,11 @@ description:
   this path with the --config-file option.  It contains a single line
   with the following format:
 
-    api_key = "YourValidAPIkeyforAbuseIpDb"
+    [AbuseIPDB]
+    api_key = YourValidAPIkeyforAbuseIpDb
+    subscriber = False
+
+  You can omit the configuration for subscriber.  It defaults to False.
 
   There is no parameter to specify the API key, because it would show up in
   the global process list.  The configuration file must only be readable
