@@ -26,7 +26,7 @@ except ImportError:
             ipaddress.ip_address(ip_address)
             return ip_network
 
-from abuseipdb.api_v1 import (AbuseIpDbV1, check_cidr, check_ip,
+from abuseipdb.api_v1 import (AbuseIpDbV1, check_cidr, check_ip,  # noqa: F401
                               configure_api_key, report_ip)
 from abuseipdb.api_v2 import AbuseIpDbV2
 

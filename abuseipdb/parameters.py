@@ -2,12 +2,12 @@ class Parameters(object):
 
     configuration = {}
     url_templates = {
-        "check_ip" : "https://www.abuseipdb.com/check/[IP]/json?key=[API_KEY]&days=[DAYS]",
-        "check_cidr" : "https://www.abuseipdb.com/check-block/json?key=[API_KEY]&network=[CIDR]&days=[DAYS]",
-        "report_ip" : "https://www.abuseipdb.com/report/json?key=[API_KEY]&category=[CATEGORIES]&comment=[COMMENT]&ip=[IP]",
+        "check_ip": "https://www.abuseipdb.com/check/[IP]/json?key=[API_KEY]&days=[DAYS]",
+        "check_cidr": "https://www.abuseipdb.com/check-block/json?key=[API_KEY]&network=[CIDR]&days=[DAYS]",
+        "report_ip": "https://www.abuseipdb.com/report/json?key=[API_KEY]&category=[CATEGORIES]&comment=[COMMENT]&ip=[IP]",  # noqa: E501
     }
     defaults = {
-        "days" : "30"
+        "days": "30"
     }
 
     @staticmethod

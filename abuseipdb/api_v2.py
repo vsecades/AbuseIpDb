@@ -19,7 +19,7 @@ class AbuseIpDbV2(object):
         'WEB_SPAM': '10',
         'EMAIL_SPAM': '11',
         'BLOG_SPAM': '12',
-        'VPN_IP':'13',
+        'VPN_IP': '13',
         'PORT_SCAN': '14',
         'HACKING': '15',
         'SQL_INJECTION': '16',

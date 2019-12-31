@@ -46,6 +46,7 @@ def read_requirements():
             requirements.append('{}'.format(line))
     return requirements
 
+
 # Arguments marked as "Required" below must be included for upload to PyPI.
 # Fields marked as "Optional" may be commented out.
 

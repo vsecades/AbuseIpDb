@@ -1,4 +1,5 @@
 from unittest import TestCase
+
 from urllib3.exceptions import HTTPError
 
 from abuseipdb import AbuseIpDb
@@ -10,7 +11,6 @@ try:
     from unittest.mock import patch
 except ImportError:
     from mock import patch
-
 
 
 @patch('requests.request')

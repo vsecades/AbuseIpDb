@@ -68,7 +68,7 @@ def report_ip(categories=None, comment="", ip=None):
 class AbuseIpDbV1(object):
 
     VERSION = 'APIv1'
-    
+
     CATEGORIES = {
         'DDOS_ATTACK': '4',
         'FTP_BRUTE_FORCE': '5',
@@ -79,7 +79,7 @@ class AbuseIpDbV1(object):
         'WEB_SPAM': '10',
         'EMAIL_SPAM': '11',
         'BLOG_SPAM': '12',
-        'VPN_IP':'13',
+        'VPN_IP': '13',
         'PORT_SCAN': '14',
         'HACKING': '15',
         'SQL_INJECTION': '16',

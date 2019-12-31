@@ -2,10 +2,9 @@ import argparse
 import json
 import os
 import stat
-import sys
+from configparser import ConfigParser, NoOptionError
 
 from abuseipdb import AbuseIpDb
-from configparser import ConfigParser, NoOptionError
 
 
 def main():
@@ -162,7 +161,7 @@ description:
 
   You need an API key for https://www.abuseipdb.com/ to use this program.
   Please visit https://www.abuseipdb.com/register to receive one.
-  
+
   You must place this API key in a configuration file.  The default
   configuration file is /etc/abuseipdb on UNIX systems. You can change
   this path with the --config-file option.  It contains a single line

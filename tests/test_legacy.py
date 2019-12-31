@@ -120,4 +120,4 @@ class LegacyTestCase(TestCase):
         # This URL looks wrong, but the APIv1 documentation doesn't indicate,
         # that the comment needs to be encoded.
         mock.assert_called_once_with(
-            'GET', 'https://www.abuseipdb.com/report/json?key=some_API_key&category=22&comment=Some comment&ip=192.0.2.123')
+                'GET', 'https://www.abuseipdb.com/report/json?key=some_API_key&category=22&comment=Some comment&ip=192.0.2.123')  # noqa: E501
