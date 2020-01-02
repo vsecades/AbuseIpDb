@@ -1,7 +1,3 @@
-**PLEASE NOTE** This fork is my development tree.  If you want to participate
-in the development, please fork from the original repository.  I will rebase
-without prior warning.
-
 # AbuseIpDb - Wrapper around the Abuse IP DB service API
 
 The package supports APIv1 and APIv2.  Retrieving a blacklist is only available
