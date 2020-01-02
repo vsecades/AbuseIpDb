@@ -150,7 +150,6 @@ def _parse_parameter():
         help="comment for the report")
 
     args = parser.parse_args()
-    print(vars(args))
     return args
 
 
