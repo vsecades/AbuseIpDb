@@ -7,11 +7,13 @@ https://packaging.python.org/en/latest/distributing.html
 https://github.com/pypa/sampleproject
 """
 
-# Always prefer setuptools over distutils
-from setuptools import setup, find_packages
 # To use a consistent encoding
 from codecs import open
 from os import path
+
+# Always prefer setuptools over distutils
+from setuptools import find_packages, setup
+
 import abuseipdb
 
 here = path.abspath(path.dirname(__file__))
@@ -19,6 +21,31 @@ here = path.abspath(path.dirname(__file__))
 # Get the long description from the README file
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
+
+
+def read_requirements():
+    """Read the dependencies from requirements.txt
+
+    This keeps the dependencies in one place.  Otherwise we would need to
+    define them in two places:
+     *  requirements.txt - required by the GitHub workflow
+     *  setup.py         - required by the packaging
+
+    Thos two are combined with this method.  Still we have dependencies in the
+    following file:
+     *  tox.ini          - required by testing with different environments
+    """
+    requirements = []
+    with open(path.join(here, 'requirements.txt'), encoding='utf-8') as f:
+        for line in f.readlines():
+            if '#' in line:
+                line = line[:line.find('#')]
+            line = line.strip()
+            if not line:
+                continue
+            requirements.append('{}'.format(line))
+    return requirements
+
 
 # Arguments marked as "Required" below must be included for upload to PyPI.
 # Fields marked as "Optional" may be commented out.
@@ -43,12 +70,12 @@ setup(
     # For a discussion on single-sourcing the version across setup.py and the
     # project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version= abuseipdb.__version__,  # Required
+    version=abuseipdb.__version__,  # Required
 
     # This is a one-line description or tagline of what your project does. This
     # corresponds to the "Summary" metadata field:
     # https://packaging.python.org/specifications/core-metadata/#summary
-    description='AbuseIPDb wrapper for IP checking and trouble reporting',  # Required
+    description='Abuse IP DB wrapper for IP checking and trouble reporting',
 
     # This is an optional longer description of your project that represents
     # the body of text which users will see when they visit PyPI.
@@ -108,6 +135,10 @@ setup(
         # that you indicate whether you support Python 2, Python 3 or both.
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
 
     # This field adds keywords for your project which will appear on the
@@ -133,7 +164,7 @@ setup(
     #
     # For an analysis of "install_requires" vs pip's requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=['unirest==1.1.7','pprint==0.1'],  # Optional
+    install_requires=read_requirements(),  # Optional
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). Users will be able to install these using the "extras"
@@ -162,7 +193,7 @@ setup(
     # http://docs.python.org/3.4/distutils/setupscript.html#installing-additional-files
     #
     # In this case, 'data_file' will be installed into '<sys.prefix>/my_data'
-    data_files=[('my_data', ['data/data_file'])],  # Optional
+    data_files=[],  # Optional
 
     # To provide executable scripts, use entry points in preference to the
     # "scripts" keyword. Entry points provide cross-platform support and allow
@@ -173,7 +204,7 @@ setup(
     # executes the function `main` from this package when invoked:
     entry_points={  # Optional
         'console_scripts': [
-            'sample=sample:main',
+            'abuseipdb=abuseipdb.cli:main',
         ],
     },
 
