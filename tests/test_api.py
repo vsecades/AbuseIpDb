@@ -204,8 +204,12 @@ class ApiReturnValueTestCase(TestCase):
         self.assert_response_contains(result, 'ipAddress', self.TEST_IP_ADDRESS)
 
 
-@patch('requests.Response.raise_for_status', side_effect=HTTPError)
+@patch('requests.request', side_effect=HTTPError)
 class NetworkFailureTestCase(TestCase):
+    # Actually we do not really test the invocation of
+    # Response.raise_for_status, but we need to prevent any real network calls.
+    # So we already raise the exception in the request and not for the HTTP
+    # status codes.
 
     # IP addresses from TEST-NET-1 according to RFC 5737
     TEST_IP_ADDRESS = '192.0.2.123'
