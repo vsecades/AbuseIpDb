@@ -107,14 +107,14 @@ def _parse_parameter():
         "bulk-report", add_help=False,
         usage="abusipdb bulk-report FILE")
     bulk_report.add_argument(
-        "report-file",
+        "report_file",
         help="file containing the bulk report")
 
     check = subparsers.add_parser(
         "check", add_help=False,
         usage="abusipdb check [{-d,--max-age-in-days] DAYS] IP_ADDRESS")
     check.add_argument(
-        "ip-address",
+        "ip_address",
         help="check or report IP address")
     check.add_argument(
         "-d", "--max-age-in-days",
@@ -125,7 +125,7 @@ def _parse_parameter():
         "check-block", add_help=False,
         usage="abusipdb check-block [{-d,--max-age-in-days} DAYS] NETWORK")
     check_block.add_argument(
-        "cidr-network",
+        "cidr_network",
         help="check CIDR network")
     check_block.add_argument(
         "-d", "--max-age-in-days",
@@ -136,7 +136,7 @@ def _parse_parameter():
         "report", add_help=False,
         usage="abusipdb report {-c,--category} CATEGORY [{-c,--category} CATEGORY [...]] IP_ADDRESS [COMMENT]")
     report.add_argument(
-        "ip-address",
+        "ip_address",
         help="check or report IP address")
     report.add_argument(
         "-c", "--category",
