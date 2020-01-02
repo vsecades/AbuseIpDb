@@ -64,7 +64,7 @@ class AbuseIpDbV2(object):
             url=BASE_URL.format(endpoint=endpoint),
             headers=headers, params=query)
         response.raise_for_status()
-        return response.json()
+        return response.json()['data']
 
     def blacklist(self, confidence_minimum=None, limit=None):
         query = {}
@@ -80,7 +80,7 @@ class AbuseIpDbV2(object):
                 msg = 'Limit {} is above {}, which is not allowed, unless you\'re a subscriber'
                 raise ValueError(msg.format(limit, self.DEFAULT.LIMIT))
             query['limit'] = str(limit)
-        return self._get_response('blacklist', query)['data']
+        return self._get_response('blacklist', query)
 
     def bulk_report(self, file_name):
         raise NotImplementedError('bulk_report not yet available.  Implementation still pending.')
@@ -90,7 +90,7 @@ class AbuseIpDbV2(object):
             'ipAddress': ip_address,
             'maxAgeInDays': str(max_age_in_days or self.DEFAULT.MAX_AGE_IN_DAYS),
         }
-        return self._get_response('check', query)['data']
+        return self._get_response('check', query)
 
     def check_block(self, cidr_network, max_age_in_days=None):
         """Check a single IPv4 or IPv6 address
@@ -101,7 +101,7 @@ class AbuseIpDbV2(object):
             'network': cidr_network,
             'maxAgeInDays': str(max_age_in_days or self.DEFAULT.MAX_AGE_IN_DAYS),
         }
-        return self._get_response('check-block', query)['data']
+        return self._get_response('check-block', query)
 
     def report(self, ip_address, categories, comment=''):
         query = {
@@ -109,4 +109,4 @@ class AbuseIpDbV2(object):
             'categories': categories,
             'comment': comment,
         }
-        return self._get_response('report', query)['data']
+        return self._get_response('report', query)

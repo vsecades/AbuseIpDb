@@ -168,7 +168,7 @@ class ApiReturnValueTestCase(TestCase):
             "ipAddress": "{}".format(self.TEST_IP_ADDRESS)
         }
         abuse = self.get_api()
-        with patch.object(abuse.api, '_get_response', return_value={"data": expected_response}):
+        with patch.object(abuse.api, '_get_response', return_value=expected_response):
             result = abuse.check(self.TEST_IP_ADDRESS)
         assert type(result) == dict
         self.assert_response_contains(result, 'ipAddress', self.TEST_IP_ADDRESS)
@@ -178,7 +178,7 @@ class ApiReturnValueTestCase(TestCase):
             "networkAddress": "{}".format(self.TEST_CIDR_NETWORK[:-3])
         }
         abuse = self.get_api()
-        with patch.object(abuse.api, '_get_response', return_value={"data": expected_response}):
+        with patch.object(abuse.api, '_get_response', return_value=expected_response):
             result = abuse.check_block(self.TEST_CIDR_NETWORK)
         assert type(result) == dict
         self.assert_response_contains(result, 'networkAddress', self.TEST_CIDR_NETWORK[:-3])
@@ -189,7 +189,7 @@ class ApiReturnValueTestCase(TestCase):
             "abuseConfidenceScore": 100,
         }]
         abuse = self.get_api()
-        with patch.object(abuse.api, '_get_response', return_value={"data": expected_response}):
+        with patch.object(abuse.api, '_get_response', return_value=expected_response):
             result = abuse.check(self.TEST_IP_ADDRESS)
         assert type(result) == list
         assert len(result) == 1
@@ -203,7 +203,7 @@ class ApiReturnValueTestCase(TestCase):
             "abuseConfidenceScore": 52,
         }
         abuse = self.get_api()
-        with patch.object(abuse.api, '_get_response', return_value={"data": expected_response}):
+        with patch.object(abuse.api, '_get_response', return_value=expected_response):
             result = abuse.report(self.TEST_IP_ADDRESS, (13, '15 ', 'SSH'))
         assert type(result) == dict
         self.assert_response_contains(result, 'ipAddress', self.TEST_IP_ADDRESS)
