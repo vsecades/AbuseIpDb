@@ -63,6 +63,8 @@ class AbuseIpDbV2(object):
             method=KNOWN_ENDPOINTS[endpoint],
             url=BASE_URL.format(endpoint=endpoint),
             headers=headers, params=query)
+        if response.status_code in (422, 429):
+            return response.json()['errors']
         response.raise_for_status()
         return response.json()['data']
 
