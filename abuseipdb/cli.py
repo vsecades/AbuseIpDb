@@ -104,8 +104,8 @@ def _parse_parameter():
         help="limit the number of entries in the blacklist")
 
     bulk_report = subparsers.add_parser(
-        "bulk-report", add_help=False,
-        usage="abusipdb bulk-report FILE")
+        "bulk_report", add_help=False,
+        usage="abusipdb bulk_report FILE")
     bulk_report.add_argument(
         "report_file",
         help="file containing the bulk report")
@@ -122,8 +122,8 @@ def _parse_parameter():
         help="only consider reports up to this age during checks")
 
     check_block = subparsers.add_parser(
-        "check-block", add_help=False,
-        usage="abusipdb check-block [{-d,--max-age-in-days} DAYS] NETWORK")
+        "check_block", add_help=False,
+        usage="abusipdb check_block [{-d,--max-age-in-days} DAYS] NETWORK")
     check_block.add_argument(
         "cidr_network",
         help="check CIDR network")
@@ -180,9 +180,9 @@ description:
 subparsers_description = """For an explanation of the commands please visit https://docs.abuseipdb.com/.
 
 abusipdb blacklist [{-l,--limit} LIMIT] [{-m,--confidence_minimum} MINIMUM]
-abusipdb bulk-report FILE
+abusipdb bulk_report FILE
 abusipdb check [{-d,--max-age-in-days} DAYS] IP_ADDRESS
-abusipdb check-block [{-d,--max-age-in-days} DAYS] NETWORK
+abusipdb check_block [{-d,--max-age-in-days} DAYS] NETWORK
 abusipdb report {-c,--category} CATEGORY [{-c,--category} CATEGORY [...]]
                 IP_ADDRESS [COMMENT]
 """
