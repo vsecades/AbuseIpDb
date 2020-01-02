@@ -24,6 +24,12 @@ def _print_result(result):
 
 
 def _create_kwargs_from_args(args):
+    def to_unicode(s):
+        try:
+            return s.decode('utf-8')
+        except:
+            return s
+
     if args.action == "blacklist":
         filter_for_keys = ("confidence_minimum", "limit")
     elif args.action == "bulk_report":
@@ -37,13 +43,20 @@ def _create_kwargs_from_args(args):
         filter_for_keys = ("ip_address", "categories", "comment")
     else:
         filter_for_keys = ()
+
     # only pass on the relevant parameters
     kwargs = {k: v for k, v in vars(args).items() if k in filter_for_keys}
+
     # argparse stores the following parameters as a list
     if "categories"in kwargs.keys():
         kwargs["categories"] = ",".join(str(c) for c in kwargs["categories"])
     if "comment"in kwargs.keys():
         kwargs["comment"] = " ".join(str(c) for c in kwargs["comment"])
+    # Needed for Python 2.7
+    if "ip_address"in kwargs.keys():
+        kwargs["ip_address"] = to_unicode(kwargs["ip_address"])
+    if "cidr_network"in kwargs.keys():
+        kwargs["cidr_network"] = to_unicode(kwargs["cidr_network"])
     return kwargs
 
 
