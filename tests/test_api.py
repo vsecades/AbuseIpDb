@@ -24,6 +24,11 @@ class ApiParameterValidationTestCase(TestCase):
     def get_api(self):
         return AbuseIpDb('some_API_key')
 
+    def test_instantiate__invalid_api_version_provided(self, request):
+        with self.assertRaises(ValueError):
+            AbuseIpDb('some_API_key', api_version='InvalidAPIversion')
+        request.assert_not_called()
+
     def test_instantiate__no_key_provided(self, request):
         with self.assertRaises(ValueError):
             AbuseIpDb(None)

@@ -19,6 +19,16 @@ class ApiV2TestCase(TestCase):
         kwargs['api_key'] = 'some_API_key'
         return AbuseIpDbV2(**kwargs)
 
+    def test_calling_undefined_endpoint_raises_exception(self, request):
+        abuse = self.get_api()
+        with self.assertRaises(NotImplementedError):
+            abuse._get_response('unknown-endpoint', {})
+
+    def test_calling_undefined_method_raises_exception(self, request):
+        abuse = self.get_api()
+        with self.assertRaises(NotImplementedError):
+            abuse.no_such_method('some parameter')
+
     def test_blacklist(self, mock):
         abuse = self.get_api()
         abuse.blacklist()
