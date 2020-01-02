@@ -141,7 +141,7 @@ class ApiV2TestCase(TestCase):
         mock.assert_called_once_with(
             method='POST',
             headers={'Key': 'some_API_key', 'Accept': 'application/json'},
-            params={'ipAddress': self.TEST_IP_ADDRESS, 'categories': '22', 'comment': ''},
+            params={'ip': self.TEST_IP_ADDRESS, 'categories': '22', 'comment': ''},
             url='https://api.abuseipdb.com/api/v2/report')
 
     def test_report__with_some_comment(self, mock):
@@ -150,5 +150,5 @@ class ApiV2TestCase(TestCase):
         mock.assert_called_once_with(
             method='POST',
             headers={'Key': 'some_API_key', 'Accept': 'application/json'},
-            params={'ipAddress': self.TEST_IP_ADDRESS, 'categories': '22', 'comment': 'Some comment'},
+            params={'ip': self.TEST_IP_ADDRESS, 'categories': '22', 'comment': 'Some comment'},
             url='https://api.abuseipdb.com/api/v2/report')
