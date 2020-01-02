@@ -59,15 +59,10 @@ class AbuseIpDbV2(object):
             msg = 'Unknown endpoint "{}"'
             raise NotImplementedError(msg.format(endpoint))
         headers = {'Key': self._api_key, 'Accept': 'application/json'}
-        kwargs = dict(
+        response = requests.request(
             method=KNOWN_ENDPOINTS[endpoint],
             url=BASE_URL.format(endpoint=endpoint),
-            headers=headers,
-        )
-        if KNOWN_ENDPOINTS[endpoint] == 'GET':
-            response = requests.request(params=query, **kwargs)
-        else:
-            response = requests.request(data=query, **kwargs)
+            headers=headers, params=query)
         response.raise_for_status()
         return response.json()
 
@@ -110,7 +105,7 @@ class AbuseIpDbV2(object):
 
     def report(self, ip_address, categories, comment=''):
         query = {
-            'ipAddress': ip_address,
+            'ip': ip_address,
             'categories': categories,
             'comment': comment,
         }
