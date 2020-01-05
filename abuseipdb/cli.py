@@ -82,6 +82,8 @@ def _create_kwargs_from_args(args):
             kwargs["comment"] = " ".join(filtered)
         else:
             kwargs["comment"] = " ".join(str(c) for c in kwargs["comment"])
+        if len(kwargs["comment"]) > 1000:
+            kwargs["comment"] = kwargs["comment"][:1000] + '\n...'
     # Needed for Python 2.7
     if "ip_address" in kwargs.keys():
         kwargs["ip_address"] = to_unicode(kwargs["ip_address"])

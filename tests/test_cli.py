@@ -108,3 +108,9 @@ class CommandLineTestCase(TestCase):
         mock.assert_called_once_with(
             ip_address=self.TEST_IP_ADDRESS, categories='15,SSH',
             comment='Some *email* *host* and *user* butnothostname andnotusername')
+
+    def test_report__with_extremly_long_comment(self, api_key_mock):
+        long_comm = 'a' * 1000
+        mock = self.call_command(
+            action='report', ip_address=self.TEST_IP_ADDRESS, categories=[15, 'SSH'], comment=[long_comm, 'comment'])
+        mock.assert_called_once_with(ip_address=self.TEST_IP_ADDRESS, categories='15,SSH', comment=long_comm + '\n...')
