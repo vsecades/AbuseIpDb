@@ -103,7 +103,8 @@ class CommandLineTestCase(TestCase):
             with patch('socket.gethostname', return_value='hostname'):
                 mock = self.call_command(
                     action='report', ip_address=self.TEST_IP_ADDRESS, categories=[15, 'SSH'], mask_sensitive_data=True,
-                    comment=["Some", "hostname", "and", "username", "butnothostname", "andnotusername"])
+                    comment=["Some", "email@example.com", "hostname", "and", "username", "butnothostname",
+                             "andnotusername"])
         mock.assert_called_once_with(
             ip_address=self.TEST_IP_ADDRESS, categories='15,SSH',
-            comment='Some *host* and *user* butnothostname andnotusername')
+            comment='Some *email* *host* and *user* butnothostname andnotusername')

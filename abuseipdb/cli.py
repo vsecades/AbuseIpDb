@@ -70,12 +70,15 @@ def _create_kwargs_from_args(args):
             hostname = socket.gethostname()
             users = [user[0].lower() for user in pwd.getpwall()]
             for word in kwargs["comment"]:
-                if str(word).lower() == hostname.lower():
+                word = str(word)
+                if word.lower() == hostname.lower():
                     filtered.append('*host*')
-                elif str(word).lower() in users:
+                elif word.lower() in users:
                     filtered.append('*user*')
+                elif '@' in word:
+                    filtered.append('*email*')
                 else:
-                    filtered.append(str(word))
+                    filtered.append(word)
             kwargs["comment"] = " ".join(filtered)
         else:
             kwargs["comment"] = " ".join(str(c) for c in kwargs["comment"])
