@@ -44,6 +44,19 @@ def _to_unicode(s):
         return s
 
 
+def _convert_to_flattened_list(comment):
+    """This handles cases, where strings are quoted on the command line"""
+    splitted = []
+    for item in comment:
+        print(splitted)
+        if ' ' in item:
+            splitted.extend(item.split())
+        else:
+            splitted.append(str(item))
+    print(splitted)
+    return splitted
+
+
 def _filter_for_sensitive_data(comment):
     filtered = []
     hostname = socket.gethostname()
@@ -87,6 +100,7 @@ def _create_kwargs_from_args(args):
     if "categories" in kwargs.keys():
         kwargs["categories"] = ",".join(str(c) for c in kwargs["categories"])
     if "comment" in kwargs.keys():
+        kwargs["comment"] = _convert_to_flattened_list(kwargs["comment"])
         if mask_sensitive_data:
             kwargs["comment"] = _filter_for_sensitive_data(kwargs["comment"])
         kwargs["comment"] = " ".join(str(c) for c in kwargs["comment"])
