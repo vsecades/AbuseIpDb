@@ -36,12 +36,15 @@ def _print_result(result):
     print(json.dumps(result, indent=4, sort_keys=True))
 
 
+def _to_unicode(s):
+    # Needed for Python 2.7
+    try:
+        return s.decode('utf-8')
+    except (UnicodeDecodeError, AttributeError):
+        return s
+
+
 def _create_kwargs_from_args(args):
-    def to_unicode(s):
-        try:
-            return s.decode('utf-8')
-        except:
-            return s
 
     if args.action == "blacklist":
         filter_for_keys = ("confidence_minimum", "limit")
@@ -86,9 +89,9 @@ def _create_kwargs_from_args(args):
             kwargs["comment"] = kwargs["comment"][:1000] + '\n...'
     # Needed for Python 2.7
     if "ip_address" in kwargs.keys():
-        kwargs["ip_address"] = to_unicode(kwargs["ip_address"])
+        kwargs["ip_address"] = _to_unicode(kwargs["ip_address"])
     if "cidr_network" in kwargs.keys():
-        kwargs["cidr_network"] = to_unicode(kwargs["cidr_network"])
+        kwargs["cidr_network"] = _to_unicode(kwargs["cidr_network"])
     return kwargs
 
 
