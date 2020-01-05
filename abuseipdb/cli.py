@@ -230,7 +230,7 @@ subparsers_description = """For an explanation of the commands please visit http
 
 abusipdb blacklist [{-l,--limit} LIMIT] [{-m,--confidence_minimum} MINIMUM]
 abusipdb bulk_report FILE
-abusipdb categories
+abusipdb list_categories
 abusipdb check [{-d,--max-age-in-days} DAYS] IP_ADDRESS
 abusipdb check_block [{-d,--max-age-in-days} DAYS] NETWORK
 abusipdb report {-c,--category} CATEGORY [{-c,--category} CATEGORY [...]]
