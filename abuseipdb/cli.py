@@ -44,6 +44,23 @@ def _to_unicode(s):
         return s
 
 
+def _filter_for_sensitive_data(comment):
+    filtered = []
+    hostname = socket.gethostname()
+    users = [user[0].lower() for user in pwd.getpwall()]
+    for word in comment:
+        word = str(word)
+        if word.lower() == hostname.lower():
+            filtered.append('*host*')
+        elif word.lower() in users:
+            filtered.append('*user*')
+        elif '@' in word:
+            filtered.append('*email*')
+        else:
+            filtered.append(word)
+    return filtered
+
+
 def _get_list_of_arguments_for_action(args):
     if args.action == "blacklist":
         return ("confidence_minimum", "limit")
@@ -71,22 +88,8 @@ def _create_kwargs_from_args(args):
         kwargs["categories"] = ",".join(str(c) for c in kwargs["categories"])
     if "comment" in kwargs.keys():
         if mask_sensitive_data:
-            filtered = []
-            hostname = socket.gethostname()
-            users = [user[0].lower() for user in pwd.getpwall()]
-            for word in kwargs["comment"]:
-                word = str(word)
-                if word.lower() == hostname.lower():
-                    filtered.append('*host*')
-                elif word.lower() in users:
-                    filtered.append('*user*')
-                elif '@' in word:
-                    filtered.append('*email*')
-                else:
-                    filtered.append(word)
-            kwargs["comment"] = " ".join(filtered)
-        else:
-            kwargs["comment"] = " ".join(str(c) for c in kwargs["comment"])
+            kwargs["comment"] = _filter_for_sensitive_data(kwargs["comment"])
+        kwargs["comment"] = " ".join(str(c) for c in kwargs["comment"])
         if len(kwargs["comment"]) > 1000:
             kwargs["comment"] = kwargs["comment"][:1000] + '\n...'
     # Needed for Python 2.7
