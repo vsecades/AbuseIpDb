@@ -44,22 +44,24 @@ def _to_unicode(s):
         return s
 
 
-def _create_kwargs_from_args(args):
-
+def _get_list_of_arguments_for_action(args):
     if args.action == "blacklist":
-        filter_for_keys = ("confidence_minimum", "limit")
+        return ("confidence_minimum", "limit")
     elif args.action == "bulk_report":
-        filter_for_keys = ("file_name")
         args.file_name = args.report_file
+        return ("file_name")
     elif args.action == "check":
-        filter_for_keys = ("ip_address", "max_age_in_days")
+        return ("ip_address", "max_age_in_days")
     elif args.action == "check_block":
-        filter_for_keys = ("cidr_network", "max_age_in_days")
+        return ("cidr_network", "max_age_in_days")
     elif args.action == "report":
-        filter_for_keys = ("ip_address", "categories", "comment", "mask_sensitive_data")
+        return ("ip_address", "categories", "comment", "mask_sensitive_data")
     else:
-        filter_for_keys = ()
+        return ()
 
+
+def _create_kwargs_from_args(args):
+    filter_for_keys = _get_list_of_arguments_for_action(args)
     # only pass on the relevant parameters
     kwargs = {k: v for k, v in vars(args).items() if k in filter_for_keys}
     mask_sensitive_data = kwargs.pop('mask_sensitive_data', False)
