@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-__version__ = '2.1.0'  #: the working version
+__version__ = '2.2.1'  #: the working version
 __release__ = '2.0.0'  #: the release version
 
 try:

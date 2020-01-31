@@ -1,6 +1,8 @@
 import argparse
 import json
 import os
+import pwd
+import socket
 import stat
 from configparser import ConfigParser, NoOptionError
 
@@ -40,22 +42,36 @@ def _create_kwargs_from_args(args):
     elif args.action == "check_block":
         filter_for_keys = ("cidr_network", "max_age_in_days")
     elif args.action == "report":
-        filter_for_keys = ("ip_address", "categories", "comment")
+        filter_for_keys = ("ip_address", "categories", "comment", "mask_sensitive_data")
     else:
         filter_for_keys = ()
 
     # only pass on the relevant parameters
     kwargs = {k: v for k, v in vars(args).items() if k in filter_for_keys}
+    mask_sensitive_data = kwargs.pop('mask_sensitive_data', False)
 
     # argparse stores the following parameters as a list
-    if "categories"in kwargs.keys():
+    if "categories" in kwargs.keys():
         kwargs["categories"] = ",".join(str(c) for c in kwargs["categories"])
-    if "comment"in kwargs.keys():
-        kwargs["comment"] = " ".join(str(c) for c in kwargs["comment"])
+    if "comment" in kwargs.keys():
+        if mask_sensitive_data:
+            filtered = []
+            hostname = socket.gethostname()
+            users = [user[0].lower() for user in pwd.getpwall()]
+            for word in kwargs["comment"]:
+                if str(word).lower() == hostname.lower():
+                    filtered.append('*host*')
+                elif str(word).lower() in users:
+                    filtered.append('*user*')
+                else:
+                    filtered.append(str(word))
+            kwargs["comment"] = " ".join(filtered)
+        else:
+            kwargs["comment"] = " ".join(str(c) for c in kwargs["comment"])
     # Needed for Python 2.7
-    if "ip_address"in kwargs.keys():
+    if "ip_address" in kwargs.keys():
         kwargs["ip_address"] = to_unicode(kwargs["ip_address"])
-    if "cidr_network"in kwargs.keys():
+    if "cidr_network" in kwargs.keys():
         kwargs["cidr_network"] = to_unicode(kwargs["cidr_network"])
     return kwargs
 
@@ -96,6 +112,11 @@ def _parse_parameter():
                         default="/etc/abuseipdb",
                         metavar="FILE",
                         help="specify a different configuration file")
+    parser.add_argument("-s", "--mask-sensitive-data",
+                        action='store_true',
+                        default=False,
+                        dest="mask_sensitive_data",
+                        help="mask sensitive data before sending it to Abuse IP DB")
     subparsers = parser.add_subparsers(
         title="subcommands",
         description=subparsers_description,
