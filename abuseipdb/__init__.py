@@ -1,49 +1,23 @@
 # -*- coding: utf-8 -*-
 
-__version__ = '2.2.2'  #: the working version
-__release__ = '2.0.0'  #: the release version
+__version__ = '3.0.0'  #: the working version
+__release__ = '3.0.0'  #: the release version
 
-try:
-    import ipaddress
-except ImportError:
-    class ipaddress(object):
-        """Implement the Python3 module until we remove Python2 support
+import ipaddress
 
-        The checks are very basic.  It doesn't make sense to invest more work
-        in code, that is removed within the next few months.
-        """
-
-        @staticmethod
-        def ip_address(ip_address):
-            parts = ip_address.split('.')
-            if len(parts) != 4:
-                raise ValueError('Not an IPv4 address')
-            return ip_address
-
-        @staticmethod
-        def ip_network(ip_network):
-            ip_address, prefix = ip_network.split('/')
-            ipaddress.ip_address(ip_address)
-            return ip_network
-
-from abuseipdb.api_v1 import (AbuseIpDbV1, check_cidr, check_ip,  # noqa: F401
-                              configure_api_key, report_ip)
 from abuseipdb.api_v2 import AbuseIpDbV2
 
 
 class AbuseIpDb(object):
     """Wrapper for AbuseIpDb blacklist service
 
-    Can handle version 1 and 2 of the API.
-    Not all functionality is available for both API versions.
+    Can handle version 2 of the API.
 
     For links to the documentation see the modules.
     """
 
     def __init__(self, api_key, api_version=AbuseIpDbV2.VERSION, subscriber=False):
-        if api_version == AbuseIpDbV1.VERSION:
-            self.api = AbuseIpDbV1(api_key=api_key)
-        elif api_version == AbuseIpDbV2.VERSION:
+        if api_version == AbuseIpDbV2.VERSION:
             self.api = AbuseIpDbV2(api_key=api_key, subscriber=subscriber)
         else:
             msg = 'API version {} is not supported'
