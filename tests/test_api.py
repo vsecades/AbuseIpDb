@@ -1,16 +1,10 @@
 from unittest import TestCase
+from unittest.mock import patch
 
 from urllib3.exceptions import HTTPError
 
 from abuseipdb import AbuseIpDb
-from abuseipdb.api_v1 import AbuseIpDbV1
 from abuseipdb.api_v2 import AbuseIpDbV2
-from abuseipdb.parameters import Parameters
-
-try:
-    from unittest.mock import patch
-except ImportError:
-    from mock import patch
 
 
 @patch('requests.request')
@@ -242,54 +236,6 @@ class NetworkFailureTestCase(TestCase):
         abuse = self.get_api()
         with self.assertRaises(HTTPError):
             abuse.report(self.TEST_IP_ADDRESS, '22')
-
-
-class GenericApiV1TestCase(TestCase):
-    # Only testing the interface.  The rest is tested in `test_api_v1.py`
-
-    # IP addresses from TEST-NET-1 according to RFC 5737
-    TEST_IP_ADDRESS = '192.0.2.123'
-    TEST_CIDR_NETWORK = '192.0.2.0/24'
-
-    def get_api(self):
-        self.reset_configuration()
-        return AbuseIpDb('some_API_key', 'APIv1')
-
-    def reset_configuration(self):
-        # This is required to test the configuration isolated
-        Parameters.configuration = {}
-
-    def test_creating_api(self):
-        abuse = self.get_api()
-        assert type(abuse.api) == AbuseIpDbV1
-
-    def test_blacklist(self):
-        abuse = self.get_api()
-        with self.assertRaises(NotImplementedError):
-            abuse.blacklist()
-
-    def test_bulk_report(self):
-        abuse = self.get_api()
-        with self.assertRaises(NotImplementedError):
-            abuse.bulk_report('some_file.vsv')
-
-    @patch('abuseipdb.api_v1.AbuseIpDbV1.check')
-    def test_check(self, mock):
-        abuse = self.get_api()
-        abuse.check(self.TEST_IP_ADDRESS)
-        mock.assert_called_once_with(self.TEST_IP_ADDRESS, None)
-
-    @patch('abuseipdb.api_v1.AbuseIpDbV1.check_block')
-    def test_check_block(self, mock):
-        abuse = self.get_api()
-        abuse.check_block(self.TEST_CIDR_NETWORK)
-        mock.assert_called_once_with(self.TEST_CIDR_NETWORK, None)
-
-    @patch('abuseipdb.api_v1.AbuseIpDbV1.report')
-    def test_report(self, mock):
-        abuse = self.get_api()
-        abuse.report(self.TEST_IP_ADDRESS, '22')
-        mock.assert_called_once_with(self.TEST_IP_ADDRESS, '22', '')
 
 
 class GenericApiV2TestCase(TestCase):

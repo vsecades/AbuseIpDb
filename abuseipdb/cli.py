@@ -12,13 +12,24 @@ from abuseipdb import AbuseIpDb
 def main():
     args = _parse_parameter()
     api = _create_api(args)
-    kwargs = _create_kwargs_from_args(args)
-    result = _call_action(api, args.action, **kwargs)
-    _print_result(result)
+    if args.action == "list_categories":
+        _print_categories(api)
+    else:
+        kwargs = _create_kwargs_from_args(args)
+        result = _call_action(api, args.action, **kwargs)
+        _print_result(result)
 
 
 def _call_action(api, action, **kwargs):
     return getattr(api, action)(**kwargs)
+
+
+def _print_categories(api):
+    template = "{:15} - {:>7}"
+    print(template.format('Mame', 'Numeric'))
+    print("-"*25)
+    for item in api.api.CATEGORIES.items():
+        print(template.format(*item))
 
 
 def _print_result(result):
@@ -144,6 +155,10 @@ def _parse_parameter():
         "report_file",
         help="file containing the bulk report")
 
+    subparsers.add_parser(
+        "list_categories", add_help=False,
+        usage="abusipdb list_categories")
+
     check = subparsers.add_parser(
         "check", add_help=False,
         usage="abusipdb check [{-d,--max-age-in-days] DAYS] IP_ADDRESS")
@@ -215,6 +230,7 @@ subparsers_description = """For an explanation of the commands please visit http
 
 abusipdb blacklist [{-l,--limit} LIMIT] [{-m,--confidence_minimum} MINIMUM]
 abusipdb bulk_report FILE
+abusipdb categories
 abusipdb check [{-d,--max-age-in-days} DAYS] IP_ADDRESS
 abusipdb check_block [{-d,--max-age-in-days} DAYS] NETWORK
 abusipdb report {-c,--category} CATEGORY [{-c,--category} CATEGORY [...]]

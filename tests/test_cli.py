@@ -1,12 +1,8 @@
 from argparse import Namespace
 from unittest import TestCase
+from unittest.mock import patch
 
 from abuseipdb.cli import main as abuseipdb_cli
-
-try:
-    from unittest.mock import patch
-except ImportError:
-    from mock import patch
 
 
 @patch('abuseipdb.cli._read_api_key_and_subscriber_status', return_value=("SomeAPIkey", False))
@@ -58,6 +54,15 @@ class CommandLineTestCase(TestCase):
         mock = self.call_command(
             action='bulk_report', report_file='report.csv')
         mock.assert_called_once_with(file_name='report.csv')
+
+    def test_categories(self, api_key_mock):
+        defaults = dict(
+            action='list_categories',
+            api_version=2,
+            config_file="/etc/abiseipdb",
+        )
+        with patch('abuseipdb.cli._parse_parameter', return_value=Namespace(**defaults)):
+            abuseipdb_cli()
 
     def test_check__without_any_optional_parameter(self, api_key_mock):
         mock = self.call_command(
