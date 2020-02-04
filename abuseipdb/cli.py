@@ -36,27 +36,62 @@ def _print_result(result):
     print(json.dumps(result, indent=4, sort_keys=True))
 
 
-def _create_kwargs_from_args(args):
-    def to_unicode(s):
-        try:
-            return s.decode('utf-8')
-        except:
-            return s
+def _to_unicode(s):
+    # Needed for Python 2.7
+    try:
+        return s.decode('utf-8')
+    except (UnicodeDecodeError, AttributeError):
+        return s
 
+
+def _convert_to_flattened_list(comment):
+    """This handles cases, where strings are quoted on the command line"""
+    splitted = []
+    for item in comment:
+        print(splitted)
+        if ' ' in item:
+            splitted.extend(item.split())
+        else:
+            splitted.append(str(item))
+    print(splitted)
+    return splitted
+
+
+def _filter_for_sensitive_data(comment):
+    filtered = []
+    hostname = socket.gethostname()
+    users = [user[0].lower() for user in pwd.getpwall()]
+    for word in comment:
+        word = str(word)
+        if word.lower() == hostname.lower():
+            filtered.append('*host*')
+        elif word.lower() in users:
+            filtered.append('*user*')
+        elif '@' in word:
+            filtered.append('*email*')
+        else:
+            filtered.append(word)
+    return filtered
+
+
+def _get_list_of_arguments_for_action(args):
     if args.action == "blacklist":
-        filter_for_keys = ("confidence_minimum", "limit")
+        return ("confidence_minimum", "limit")
     elif args.action == "bulk_report":
-        filter_for_keys = ("file_name")
         args.file_name = args.report_file
+        return ("file_name")
     elif args.action == "check":
-        filter_for_keys = ("ip_address", "max_age_in_days")
+        return ("ip_address", "max_age_in_days")
     elif args.action == "check_block":
-        filter_for_keys = ("cidr_network", "max_age_in_days")
+        return ("cidr_network", "max_age_in_days")
     elif args.action == "report":
-        filter_for_keys = ("ip_address", "categories", "comment", "mask_sensitive_data")
+        return ("ip_address", "categories", "comment", "mask_sensitive_data")
     else:
-        filter_for_keys = ()
+        return ()
 
+
+def _create_kwargs_from_args(args):
+    filter_for_keys = _get_list_of_arguments_for_action(args)
     # only pass on the relevant parameters
     kwargs = {k: v for k, v in vars(args).items() if k in filter_for_keys}
     mask_sensitive_data = kwargs.pop('mask_sensitive_data', False)
@@ -65,25 +100,17 @@ def _create_kwargs_from_args(args):
     if "categories" in kwargs.keys():
         kwargs["categories"] = ",".join(str(c) for c in kwargs["categories"])
     if "comment" in kwargs.keys():
+        kwargs["comment"] = _convert_to_flattened_list(kwargs["comment"])
         if mask_sensitive_data:
-            filtered = []
-            hostname = socket.gethostname()
-            users = [user[0].lower() for user in pwd.getpwall()]
-            for word in kwargs["comment"]:
-                if str(word).lower() == hostname.lower():
-                    filtered.append('*host*')
-                elif str(word).lower() in users:
-                    filtered.append('*user*')
-                else:
-                    filtered.append(str(word))
-            kwargs["comment"] = " ".join(filtered)
-        else:
-            kwargs["comment"] = " ".join(str(c) for c in kwargs["comment"])
+            kwargs["comment"] = _filter_for_sensitive_data(kwargs["comment"])
+        kwargs["comment"] = " ".join(str(c) for c in kwargs["comment"])
+        if len(kwargs["comment"]) > 1000:
+            kwargs["comment"] = kwargs["comment"][:1000] + '\n...'
     # Needed for Python 2.7
     if "ip_address" in kwargs.keys():
-        kwargs["ip_address"] = to_unicode(kwargs["ip_address"])
+        kwargs["ip_address"] = _to_unicode(kwargs["ip_address"])
     if "cidr_network" in kwargs.keys():
-        kwargs["cidr_network"] = to_unicode(kwargs["cidr_network"])
+        kwargs["cidr_network"] = _to_unicode(kwargs["cidr_network"])
     return kwargs
 
 
@@ -230,7 +257,7 @@ subparsers_description = """For an explanation of the commands please visit http
 
 abusipdb blacklist [{-l,--limit} LIMIT] [{-m,--confidence_minimum} MINIMUM]
 abusipdb bulk_report FILE
-abusipdb categories
+abusipdb list_categories
 abusipdb check [{-d,--max-age-in-days} DAYS] IP_ADDRESS
 abusipdb check_block [{-d,--max-age-in-days} DAYS] NETWORK
 abusipdb report {-c,--category} CATEGORY [{-c,--category} CATEGORY [...]]

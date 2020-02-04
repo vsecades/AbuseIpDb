@@ -3,7 +3,6 @@
 __version__ = '3.0.0'  #: the working version
 __release__ = '3.0.0'  #: the release version
 
-
 import ipaddress
 
 from abuseipdb.api_v2 import AbuseIpDbV2
