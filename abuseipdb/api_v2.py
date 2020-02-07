@@ -19,7 +19,7 @@ class AbuseIpDbV2(object):
         'WEB_SPAM': '10',
         'EMAIL_SPAM': '11',
         'BLOG_SPAM': '12',
-        'VPN_IP':'13',
+        'VPN_IP': '13',
         'PORT_SCAN': '14',
         'HACKING': '15',
         'SQL_INJECTION': '16',
@@ -63,8 +63,10 @@ class AbuseIpDbV2(object):
             method=KNOWN_ENDPOINTS[endpoint],
             url=BASE_URL.format(endpoint=endpoint),
             headers=headers, params=query)
+        if response.status_code in (422, 429):
+            return response.json()['errors']
         response.raise_for_status()
-        return response.json()
+        return response.json()['data']
 
     def blacklist(self, confidence_minimum=None, limit=None):
         query = {}
@@ -80,7 +82,7 @@ class AbuseIpDbV2(object):
                 msg = 'Limit {} is above {}, which is not allowed, unless you\'re a subscriber'
                 raise ValueError(msg.format(limit, self.DEFAULT.LIMIT))
             query['limit'] = str(limit)
-        return self._get_response('blacklist', query)['data']
+        return self._get_response('blacklist', query)
 
     def bulk_report(self, file_name):
         raise NotImplementedError('bulk_report not yet available.  Implementation still pending.')
@@ -90,7 +92,7 @@ class AbuseIpDbV2(object):
             'ipAddress': ip_address,
             'maxAgeInDays': str(max_age_in_days or self.DEFAULT.MAX_AGE_IN_DAYS),
         }
-        return self._get_response('check', query)['data']
+        return self._get_response('check', query)
 
     def check_block(self, cidr_network, max_age_in_days=None):
         """Check a single IPv4 or IPv6 address
@@ -101,12 +103,12 @@ class AbuseIpDbV2(object):
             'network': cidr_network,
             'maxAgeInDays': str(max_age_in_days or self.DEFAULT.MAX_AGE_IN_DAYS),
         }
-        return self._get_response('check-block', query)['data']
+        return self._get_response('check-block', query)
 
     def report(self, ip_address, categories, comment=''):
         query = {
-            'ipAddress': ip_address,
+            'ip': ip_address,
             'categories': categories,
             'comment': comment,
         }
-        return self._get_response('report', query)['data']
+        return self._get_response('report', query)

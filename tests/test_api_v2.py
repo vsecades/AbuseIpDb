@@ -1,11 +1,7 @@
 from unittest import TestCase
+from unittest.mock import patch
 
 from abuseipdb.api_v2 import AbuseIpDbV2
-
-try:
-    from unittest.mock import patch
-except ImportError:
-    from mock import patch
 
 
 @patch('requests.request')
@@ -18,6 +14,16 @@ class ApiV2TestCase(TestCase):
     def get_api(self, **kwargs):
         kwargs['api_key'] = 'some_API_key'
         return AbuseIpDbV2(**kwargs)
+
+    def test_calling_undefined_endpoint_raises_exception(self, request):
+        abuse = self.get_api()
+        with self.assertRaises(NotImplementedError):
+            abuse._get_response('unknown-endpoint', {})
+
+    def test_calling_undefined_method_raises_exception(self, request):
+        abuse = self.get_api()
+        with self.assertRaises(NotImplementedError):
+            abuse.no_such_method('some parameter')
 
     def test_blacklist(self, mock):
         abuse = self.get_api()
@@ -98,15 +104,6 @@ class ApiV2TestCase(TestCase):
             params={'ipAddress': self.TEST_IP_ADDRESS, 'maxAgeInDays': '30'},
             url='https://api.abuseipdb.com/api/v2/check')
 
-    def test_check(self, mock):
-        abuse = self.get_api()
-        abuse.check(ip_address=self.TEST_IP_ADDRESS)
-        mock.assert_called_once_with(
-            method='GET',
-            headers={'Key': 'some_API_key', 'Accept': 'application/json'},
-            params={'ipAddress': self.TEST_IP_ADDRESS, 'maxAgeInDays': '30'},
-            url='https://api.abuseipdb.com/api/v2/check')
-
     def test_check__with_different_days(self, mock):
         abuse = self.get_api()
         abuse.check(ip_address=self.TEST_IP_ADDRESS, max_age_in_days='90')
@@ -140,7 +137,7 @@ class ApiV2TestCase(TestCase):
         mock.assert_called_once_with(
             method='POST',
             headers={'Key': 'some_API_key', 'Accept': 'application/json'},
-            params={'ipAddress': self.TEST_IP_ADDRESS, 'categories': '22', 'comment': ''},
+            params={'ip': self.TEST_IP_ADDRESS, 'categories': '22', 'comment': ''},
             url='https://api.abuseipdb.com/api/v2/report')
 
     def test_report__with_some_comment(self, mock):
@@ -149,5 +146,5 @@ class ApiV2TestCase(TestCase):
         mock.assert_called_once_with(
             method='POST',
             headers={'Key': 'some_API_key', 'Accept': 'application/json'},
-            params={'ipAddress': self.TEST_IP_ADDRESS, 'categories': '22', 'comment': 'Some comment'},
+            params={'ip': self.TEST_IP_ADDRESS, 'categories': '22', 'comment': 'Some comment'},
             url='https://api.abuseipdb.com/api/v2/report')
