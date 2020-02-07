@@ -12,7 +12,8 @@ pip install abuseipdb
 ## Usage as a python module
 
 To choose between the API versions, you pass the version as the second
-parameter.  Use the string APIv2 to select the API version.
+parameter.  Use the string APIv2 to select the API version.  This is currently
+the only API supported by AbuseIPDB.
 
 ```python
 from abuseipdb import AbuseIpDb
@@ -21,7 +22,7 @@ abuse = AbuseIpDb(api_key='APIv2key')                          # Also using API 
 ```
 
 If you have a subscription plan with Abuse IP DB, you can indicate this with an
-additional parameter.  This has only an effect for the APIv2.
+additional parameter.
 
 ```python
 from abuseipdb import AbuseIpDb
@@ -44,7 +45,7 @@ abuse.check_block(cidr_network="192.0.2.0/24", max_age_in_days=90)
 
 ### Report an abusive IP address
 
-All the following calls result in the same call to AbuseIpDb.  If yyou pass in
+All the following calls result in the same call to AbuseIpDb.  If you pass in
 an unkonwn category, it will raise a `ValueError`.
 
 
@@ -62,6 +63,7 @@ This adds a comment to the report.
 ```python
 abuse.report(ip_address="192.0.2.123", categories=("13", "22"),
              comment="Some comment about the abusive IP address")
+```
 
 ### Report a list of abusive IP addresses
 
@@ -71,6 +73,8 @@ for the exact specification of the CSV file.
 ```python
 abuse.bulk_report(file_name="report.csv")
 ```
+
+**NOTE:** This is currently not implemented.
 
 ### Retrieve a list of abusive IP addresses
 
