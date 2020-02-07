@@ -94,6 +94,22 @@ with the `--help` parameter.
 abuseipdb --help
 ```
 
+### fail2ban
+
+The CLI was developed for usage with *fail2ban*.  Use the following action
+instead of *wget* or *curl*:
+
+```
+actionban = abuseipdb -s report -c "<abuseipdb_category>" "<ip>" "<matches>"
+actionban = abuseipdb --mask-sensitive-data report --category "<abuseipdb_category>" "<ip>" "<matches>"
+```
+
+The lines do the same.  Of course you can leave out the masking of sensitive
+data, but it is a bad idea.  It will replace your own hostname with `*host*`,
+any existing user with `*user*` and any email address with `*email*`.  This
+will prevent any information leakage about your system and reduce the attack
+surface a little bit.
+
 ## Project links
 
  * [AbuseIpDB Repository](https://github.com/vsecades/AbuseIpDb "AbuseIpDB Repository")
