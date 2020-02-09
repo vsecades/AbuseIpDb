@@ -12,17 +12,23 @@ class CommandLineTestHelper(object):
     TEST_IP_ADDRESS = '192.0.2.123'
     TEST_CIDR_NETWORK = '192.0.2.0/24'
 
-    def call_command(self, **kwargs):
-        """Mocking argparse, as we assume it works correctly"""
+    def call_command(self, hostname='hostname', username='username', **kwargs):
+        """Mocking external calles
+
+        This mocks several external dependencies.  We assume them to work
+        properly.
+        """
         defaults = dict(
             api_version=2,
             config_file="/etc/abiseipdb",
         )
         defaults.update(**kwargs)
-        with patch('abuseipdb.cli._print_result'):
-            with patch('abuseipdb.cli._parse_parameter', return_value=Namespace(**defaults)):
-                with patch('abuseipdb.AbuseIpDb.{}'.format(kwargs['action'])) as mock:
-                    abuseipdb_cli()
+        with patch('pwd.getpwall', return_value=[(username,)]):
+            with patch('socket.gethostname', return_value=hostname):
+                with patch('abuseipdb.cli._print_result'):
+                    with patch('abuseipdb.cli._parse_parameter', return_value=Namespace(**defaults)):
+                        with patch('abuseipdb.AbuseIpDb.{}'.format(kwargs['action'])) as mock:
+                            abuseipdb_cli()
         return mock
 
 
@@ -104,22 +110,17 @@ class CommandLineTestCase(CommandLineTestHelper, TestCase):
         mock.assert_called_once_with(ip_address=self.TEST_IP_ADDRESS, categories='15,SSH', comment='a comment')
 
     def test_report__with_sensitive_comment(self, mock):
-        with patch('pwd.getpwall', return_value=[('username',)]):
-            with patch('socket.gethostname', return_value='hostname'):
-                mock = self.call_command(
-                    action='report', ip_address=self.TEST_IP_ADDRESS, categories=[15, 'SSH'], mask_sensitive_data=True,
-                    comment=["Some", "email@example.com", "hostname", "and", "username", "butnothostname",
-                             "andnotusername"])
+        mock = self.call_command(
+            action='report', ip_address=self.TEST_IP_ADDRESS, categories=[15, 'SSH'], mask_sensitive_data=True,
+            comment=["Some", "email@example.com", "hostname", "and", "username", "butnothostname", "andnotusername"])
         mock.assert_called_once_with(
             ip_address=self.TEST_IP_ADDRESS, categories='15,SSH',
             comment='Some *email* *host* and *user* butnothostname andnotusername')
 
     def test_report__with_sensitive_quoted_comment(self, mock):
-        with patch('pwd.getpwall', return_value=[('username',)]):
-            with patch('socket.gethostname', return_value='hostname'):
-                mock = self.call_command(
-                    action='report', ip_address=self.TEST_IP_ADDRESS, categories=[15, 'SSH'], mask_sensitive_data=True,
-                    comment=["Some email@example.com hostname and username butnothostname andnotusername"])
+        mock = self.call_command(
+            action='report', ip_address=self.TEST_IP_ADDRESS, categories=[15, 'SSH'], mask_sensitive_data=True,
+            comment=["Some email@example.com hostname and username butnothostname andnotusername"])
         mock.assert_called_once_with(
             ip_address=self.TEST_IP_ADDRESS, categories='15,SSH',
             comment='Some *email* *host* and *user* butnothostname andnotusername')
