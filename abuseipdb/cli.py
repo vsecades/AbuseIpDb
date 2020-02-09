@@ -2,6 +2,7 @@ import argparse
 import json
 import os
 import pwd
+import re
 import socket
 import stat
 from configparser import ConfigParser, NoOptionError
@@ -59,6 +60,7 @@ def _filter_for_sensitive_data(comment):
     filtered = []
     hostname = socket.gethostname()
     users = [user[0].lower() for user in pwd.getpwall()]
+    pattern = re.compile(r'[a-zA-Z0-9.+-]*\w@\w[a-zA-Z0-9.:+-]*\.\w+')
     for word in comment:
         word = str(word)
         if word.lower() == hostname.lower():
@@ -66,7 +68,7 @@ def _filter_for_sensitive_data(comment):
         elif word.lower() in users:
             filtered.append('*user*')
         elif '@' in word:
-            filtered.append('*email*')
+            filtered.append('*email*'.join(re.split(pattern, word)))
         else:
             filtered.append(word)
     return filtered

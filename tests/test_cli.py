@@ -130,3 +130,18 @@ class CommandLineTestCase(CommandLineTestHelper, TestCase):
         mock = self.call_command(
             action='report', ip_address=self.TEST_IP_ADDRESS, categories=[15, 'SSH'], comment=[long_comm, 'comment'])
         mock.assert_called_once_with(ip_address=self.TEST_IP_ADDRESS, categories='15,SSH', comment=long_comm + '\n...')
+
+
+@patch('abuseipdb.cli._read_api_key_and_subscriber_status', return_value=("SomeAPIkey", False))
+class CommandLineRegressionTestCase(CommandLineTestHelper, TestCase):
+
+    def test_issue_26_report_with_postgray_log_line(self, api_key_mock):
+        mock = self.call_command(
+            action='report', ip_address=self.TEST_IP_ADDRESS, categories=[15, 'SSH'], mask_sensitive_data=True,
+            comment=["Feb  7 29:23:34 hostname \\[697\\]: action=greylist, reason=new, client_name=mail.example.com, "
+                     "client_address=192.0.2.123, sender=sender.address@example.com, "
+                     "recipient=recipient.address@example.net"])
+        mock.assert_called_once_with(
+            ip_address=self.TEST_IP_ADDRESS, categories='15,SSH',
+            comment="Feb 7 29:23:34 *host* \\[697\\]: action=greylist, reason=new, client_name=mail.example.com, "
+                    "client_address=192.0.2.123, sender=*email*, recipient=*email*")
