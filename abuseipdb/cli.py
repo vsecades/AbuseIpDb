@@ -48,12 +48,10 @@ def _convert_to_flattened_list(comment):
     """This handles cases, where strings are quoted on the command line"""
     splitted = []
     for item in comment:
-        print(splitted)
         if ' ' in item:
             splitted.extend(item.split())
         else:
             splitted.append(str(item))
-    print(splitted)
     return splitted
 
 
