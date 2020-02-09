@@ -5,13 +5,8 @@ from unittest.mock import patch
 from abuseipdb.cli import main as abuseipdb_cli
 
 
-@patch('abuseipdb.cli._read_api_key_and_subscriber_status', return_value=("SomeAPIkey", False))
-class CommandLineTestCase(TestCase):
-    # Only testing the invocation of AbuseIpDb.
-    # The functionality itself is tested in the test modules for the API
-    # version.  Likewise we check for valid parameters in the tests for the
-    # generic API.
-    # We also rely on argparse to report missing or unknown parameters
+class CommandLineTestHelper(object):
+    """Providing common functionality to all test cases"""
 
     # IP addresses from TEST-NET-1 according to RFC 5737
     TEST_IP_ADDRESS = '192.0.2.123'
@@ -29,6 +24,15 @@ class CommandLineTestCase(TestCase):
                 with patch('abuseipdb.AbuseIpDb.{}'.format(kwargs['action'])) as mock:
                     abuseipdb_cli()
         return mock
+
+
+@patch('abuseipdb.cli._read_api_key_and_subscriber_status', return_value=("SomeAPIkey", False))
+class CommandLineTestCase(CommandLineTestHelper, TestCase):
+    # Only testing the invocation of AbuseIpDb.
+    # The functionality itself is tested in the test modules for the API
+    # version.  Likewise we check for valid parameters in the tests for the
+    # generic API.
+    # We also rely on argparse to report missing or unknown parameters
 
     def test_blacklist__without_any_optional_parameter(self, api_key_mock):
         mock = self.call_command(
