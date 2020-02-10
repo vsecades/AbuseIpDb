@@ -5,30 +5,40 @@ from unittest.mock import patch
 from abuseipdb.cli import main as abuseipdb_cli
 
 
-@patch('abuseipdb.cli._read_api_key_and_subscriber_status', return_value=("SomeAPIkey", False))
-class CommandLineTestCase(TestCase):
-    # Only testing the invocation of AbuseIpDb.
-    # The functionality itself is tested in the test modules for the API
-    # version.  Likewise we check for valid parameters in the tests for the
-    # generic API.
-    # We also rely on argparse to report missing or unknown parameters
+class CommandLineTestHelper(object):
+    """Providing common functionality to all test cases"""
 
     # IP addresses from TEST-NET-1 according to RFC 5737
     TEST_IP_ADDRESS = '192.0.2.123'
     TEST_CIDR_NETWORK = '192.0.2.0/24'
 
-    def call_command(self, **kwargs):
-        """Mocking argparse, as we assume it works correctly"""
+    def call_command(self, hostname='hostname', username='username', **kwargs):
+        """Mocking external calles
+
+        This mocks several external dependencies.  We assume them to work
+        properly.
+        """
         defaults = dict(
             api_version=2,
             config_file="/etc/abiseipdb",
         )
         defaults.update(**kwargs)
-        with patch('abuseipdb.cli._print_result'):
-            with patch('abuseipdb.cli._parse_parameter', return_value=Namespace(**defaults)):
-                with patch('abuseipdb.AbuseIpDb.{}'.format(kwargs['action'])) as mock:
-                    abuseipdb_cli()
+        with patch('pwd.getpwall', return_value=[(username,)]):
+            with patch('socket.gethostname', return_value=hostname):
+                with patch('abuseipdb.cli._print_result'):
+                    with patch('abuseipdb.cli._parse_parameter', return_value=Namespace(**defaults)):
+                        with patch('abuseipdb.AbuseIpDb.{}'.format(kwargs['action'])) as mock:
+                            abuseipdb_cli()
         return mock
+
+
+@patch('abuseipdb.cli._read_api_key_and_subscriber_status', return_value=("SomeAPIkey", False))
+class CommandLineTestCase(CommandLineTestHelper, TestCase):
+    # Only testing the invocation of AbuseIpDb.
+    # The functionality itself is tested in the test modules for the API
+    # version.  Likewise we check for valid parameters in the tests for the
+    # generic API.
+    # We also rely on argparse to report missing or unknown parameters
 
     def test_blacklist__without_any_optional_parameter(self, api_key_mock):
         mock = self.call_command(
@@ -100,22 +110,17 @@ class CommandLineTestCase(TestCase):
         mock.assert_called_once_with(ip_address=self.TEST_IP_ADDRESS, categories='15,SSH', comment='a comment')
 
     def test_report__with_sensitive_comment(self, mock):
-        with patch('pwd.getpwall', return_value=[('username',)]):
-            with patch('socket.gethostname', return_value='hostname'):
-                mock = self.call_command(
-                    action='report', ip_address=self.TEST_IP_ADDRESS, categories=[15, 'SSH'], mask_sensitive_data=True,
-                    comment=["Some", "email@example.com", "hostname", "and", "username", "butnothostname",
-                             "andnotusername"])
+        mock = self.call_command(
+            action='report', ip_address=self.TEST_IP_ADDRESS, categories=[15, 'SSH'], mask_sensitive_data=True,
+            comment=["Some", "email@example.com", "hostname", "and", "username", "butnothostname", "andnotusername"])
         mock.assert_called_once_with(
             ip_address=self.TEST_IP_ADDRESS, categories='15,SSH',
             comment='Some *email* *host* and *user* butnothostname andnotusername')
 
     def test_report__with_sensitive_quoted_comment(self, mock):
-        with patch('pwd.getpwall', return_value=[('username',)]):
-            with patch('socket.gethostname', return_value='hostname'):
-                mock = self.call_command(
-                    action='report', ip_address=self.TEST_IP_ADDRESS, categories=[15, 'SSH'], mask_sensitive_data=True,
-                    comment=["Some email@example.com hostname and username butnothostname andnotusername"])
+        mock = self.call_command(
+            action='report', ip_address=self.TEST_IP_ADDRESS, categories=[15, 'SSH'], mask_sensitive_data=True,
+            comment=["Some email@example.com hostname and username butnothostname andnotusername"])
         mock.assert_called_once_with(
             ip_address=self.TEST_IP_ADDRESS, categories='15,SSH',
             comment='Some *email* *host* and *user* butnothostname andnotusername')
@@ -125,3 +130,18 @@ class CommandLineTestCase(TestCase):
         mock = self.call_command(
             action='report', ip_address=self.TEST_IP_ADDRESS, categories=[15, 'SSH'], comment=[long_comm, 'comment'])
         mock.assert_called_once_with(ip_address=self.TEST_IP_ADDRESS, categories='15,SSH', comment=long_comm + '\n...')
+
+
+@patch('abuseipdb.cli._read_api_key_and_subscriber_status', return_value=("SomeAPIkey", False))
+class CommandLineRegressionTestCase(CommandLineTestHelper, TestCase):
+
+    def test_issue_26_report_with_postgray_log_line(self, api_key_mock):
+        mock = self.call_command(
+            action='report', ip_address=self.TEST_IP_ADDRESS, categories=[15, 'SSH'], mask_sensitive_data=True,
+            comment=["Feb  7 29:23:34 hostname \\[697\\]: action=greylist, reason=new, client_name=mail.example.com, "
+                     "client_address=192.0.2.123, sender=sender.address@example.com, "
+                     "recipient=recipient.address@example.net"])
+        mock.assert_called_once_with(
+            ip_address=self.TEST_IP_ADDRESS, categories='15,SSH',
+            comment="Feb 7 29:23:34 *host* \\[697\\]: action=greylist, reason=new, client_name=mail.example.com, "
+                    "client_address=192.0.2.123, sender=*email*, recipient=*email*")
